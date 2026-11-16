@@ -1,0 +1,71 @@
+import type { ReactNode } from 'react';
+
+export function Card({ title, icon, hint, children, accent }: { title?: string; icon?: string; hint?: string; children: ReactNode; accent?: boolean }) {
+  return (
+    <section className={`card${accent ? ' card--accent' : ''}`}>
+      {title && (
+        <header className="card__head">
+          <h2>
+            {icon && <span className="card__icon" aria-hidden>{icon}</span>}
+            {title}
+          </h2>
+          {hint && <p className="card__hint">{hint}</p>}
+        </header>
+      )}
+      {children}
+    </section>
+  );
+}
+
+export function TextField({ value, onChange, placeholder, multiline, label }: { value: string; onChange: (v: string) => void; placeholder?: string; multiline?: boolean; label?: string }) {
+  const input = multiline ? (
+    <textarea className="input" rows={2} value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
+  ) : (
+    <input className="input" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
+  );
+  if (!label) return input;
+  return (
+    <label className="field">
+      <span className="field__label">{label}</span>
+      {input}
+    </label>
+  );
+}
+
+export function Scale({ value, onChange, max = 5, labels }: { value: number | null; onChange: (v: number) => void; max?: number; labels?: string[] }) {
+  return (
+    <div className="scale" role="radiogroup">
+      {Array.from({ length: max }, (_, i) => i + 1).map((n) => (
+        <button
+          key={n}
+          type="button"
+          role="radio"
+          aria-checked={value === n}
+          className={`scale__btn${value === n ? ' is-on' : ''}`}
+          onClick={() => onChange(n)}
+        >
+          {labels?.[n - 1] ?? n}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function CheckRow({ done, text, onToggle, onText, placeholder }: { done: boolean; text: string; onToggle: () => void; onText: (v: string) => void; placeholder?: string }) {
+  return (
+    <div className={`checkrow${done ? ' is-done' : ''}`}>
+      <button type="button" className="checkbox" aria-pressed={done} aria-label={done ? 'Mark not done' : 'Mark done'} onClick={onToggle}>
+        {done ? '✓' : ''}
+      </button>
+      <input className="input input--bare" value={text} placeholder={placeholder} onChange={(e) => onText(e.target.value)} />
+    </div>
+  );
+}
+
+export function Progress({ value }: { value: number }) {
+  return (
+    <div className="progress" aria-valuenow={Math.round(value * 100)} role="progressbar">
+      <div className="progress__bar" style={{ width: `${Math.round(value * 100)}%` }} />
+    </div>
+  );
+}
