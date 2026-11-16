@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { daySummary, useStore } from '../lib/store';
 import { addDays, prettyDate, todayKey, weekdayIndex } from '../lib/dates';
-import { DISCIPLINE_IDEAS, dailyPrompt, dailyQuote } from '../lib/motivation';
+import { DISCIPLINE_IDEAS, SOCIAL_INTENTS, dailyPrompt, dailyQuestions, dailyQuote } from '../lib/motivation';
 import type { DayEntry, Meals } from '../lib/types';
-import { Card, CheckRow, Scale, TextField } from '../ui';
+import { BrandLogo, Card, CheckRow, Scale, TextField } from '../ui';
 
 const MOODS = ['😞', '😕', '😐', '🙂', '😄'];
 const ENERGY = ['🪫', '😴', '⚡', '⚡⚡', '🔥'];
@@ -14,7 +14,7 @@ const MEAL_LABELS: [keyof Meals, string][] = [
   ['snacks', 'Snacks'],
 ];
 
-export default function Today({ onShare }: { onShare: () => void }) {
+export default function Today({ onShare, onWeekly }: { onShare: () => void; onWeekly: () => void }) {
   const { state, getDay, updateDay, streak, sendMessage } = useStore();
   const [date, setDate] = useState(todayKey());
   const d = getDay(date);
@@ -24,10 +24,20 @@ export default function Today({ onShare }: { onShare: () => void }) {
   const plan = state.training[weekdayIndex(date)];
   const name = state.profile.name;
 
-  const filledTop = d.top3.filter((t) => t.text).length;
-  const doneCount =
-    d.top3.filter((t) => t.text && t.done).length + (d.discipline.text && d.discipline.done ? 1 : 0) + (d.training.done ? 1 : 0);
-  const totalCount = filledTop + (d.discipline.text ? 1 : 0) + 1;
+  const questions = dailyQuestions(date);
+  // Everything the client committed to today that can be ticked off
+  const commitments = [
+    ...d.top3.filter((t) => t.text),
+    ...d.identityActions.filter((t) => t.text),
+    ...(d.discipline.text ? [d.discipline] : []),
+    ...(d.connect.text ? [d.connect] : []),
+    d.training,
+  ];
+  const doneCount = commitments.filter((c) => c.done).length;
+  const totalCount = commitments.length;
+  const isSunday = weekdayIndex(date) === 6;
+  const setList = (field: 'top3' | 'identityActions', i: number, patch: Partial<DayEntry['top3'][number]>) =>
+    set({ [field]: d[field].map((x, j) => (j === i ? { ...x, ...patch } : x)) });
 
   const completeMorning = () => {
     set({ morningDoneAt: new Date().toISOString(), training: d.training.text ? d.training : { ...d.training, text: plan.title } });
@@ -46,6 +56,9 @@ export default function Today({ onShare }: { onShare: () => void }) {
   return (
     <div className="stack">
       <header className="hero">
+        <div className="brandbar">
+          <BrandLogo />
+        </div>
         <div className="hero__nav">
           <button className="iconbtn" aria-label="Previous day" onClick={() => setDate(addDays(date, -1))}>‹</button>
           <span>{isToday ? 'Today' : prettyDate(date)}</span>
@@ -70,6 +83,12 @@ export default function Today({ onShare }: { onShare: () => void }) {
         )}
         <p className="prompt">💭 {dailyPrompt(date)}</p>
       </Card>
+
+      {isSunday && isToday && (
+        <Card title="It’s Sunday — weekly review" icon="📅" hint="10 minutes to look back, learn, and set next week’s focus.">
+          <button className="btn" onClick={onWeekly}>Start weekly review</button>
+        </Card>
+      )}
 
       <Card title="Check in" icon="🌅" hint="How are you showing up today?">
         <div className="field">
@@ -96,6 +115,45 @@ export default function Today({ onShare }: { onShare: () => void }) {
         </label>
       </Card>
 
+      <Card title="Today’s challenge questions" icon="❓" hint="Answer honestly. Your coach will ask.">
+        {questions.map((q) => (
+          <label key={q.text} className="field question">
+            <span className={`tag tag--${q.kind.toLowerCase()}`}>{q.kind}</span>
+            <span className="question__text">{q.text}</span>
+            <textarea
+              className="input"
+              rows={2}
+              value={d.answers[q.text] ?? ''}
+              placeholder="My honest answer…"
+              onChange={(e) => set({ answers: { ...d.answers, [q.text]: e.target.value } })}
+            />
+          </label>
+        ))}
+      </Card>
+
+      <Card title="Be the person who inspires you" icon="🪞" hint={state.profile.becoming ? `You are becoming: ${state.profile.becoming}` : 'Act like the person you are becoming.'}>
+        <TextField
+          multiline
+          label="What would that person do today?"
+          value={d.futureSelf}
+          onChange={(futureSelf) => set({ futureSelf })}
+          placeholder="Wake up on the first alarm, train before work, give full attention at dinner."
+        />
+        <div className="field">
+          <span className="field__label">3 actions that prove who I am</span>
+          {d.identityActions.map((t, i) => (
+            <CheckRow
+              key={i}
+              done={t.done}
+              text={t.text}
+              placeholder={['I am disciplined, so I…', 'I am healthy, so I…', 'I am a leader, so I…'][i]}
+              onToggle={() => setList('identityActions', i, { done: !t.done })}
+              onText={(text) => setList('identityActions', i, { text })}
+            />
+          ))}
+        </div>
+      </Card>
+
       <Card title="Purpose for today" icon="🎯" hint="Why does today matter?">
         <TextField multiline value={d.purpose} onChange={(purpose) => set({ purpose })} placeholder="Today I show up as a leader for my family and my team." />
       </Card>
@@ -107,8 +165,8 @@ export default function Today({ onShare }: { onShare: () => void }) {
             done={t.done}
             text={t.text}
             placeholder={`Goal ${i + 1}`}
-            onToggle={() => set({ top3: d.top3.map((x, j) => (j === i ? { ...x, done: !x.done } : x)) })}
-            onText={(text) => set({ top3: d.top3.map((x, j) => (j === i ? { ...x, text } : x)) })}
+            onToggle={() => setList('top3', i, { done: !t.done })}
+            onText={(text) => setList('top3', i, { text })}
           />
         ))}
       </Card>
@@ -170,6 +228,43 @@ export default function Today({ onShare }: { onShare: () => void }) {
         <TextField value={d.training.notes} onChange={(notes) => set({ training: { ...d.training, notes } })} placeholder="Notes: weights, distance, how it felt…" />
       </Card>
 
+      <Card title="Socials" icon="🤝" hint="Real connection in, mindless scrolling out.">
+        <div className="field">
+          <span className="field__label">Who will I connect with today?</span>
+          <CheckRow
+            done={d.connect.done}
+            text={d.connect.text}
+            placeholder="Call mum, coffee with a friend, thank a colleague…"
+            onToggle={() => set({ connect: { ...d.connect, done: !d.connect.done } })}
+            onText={(text) => set({ connect: { ...d.connect, text } })}
+          />
+        </div>
+        <label className="field">
+          <span className="field__label">Social media limit (minutes)</span>
+          <input
+            className="input"
+            type="number"
+            min={0}
+            step={5}
+            inputMode="numeric"
+            value={d.socialLimit ?? ''}
+            placeholder="30"
+            onChange={(e) => set({ socialLimit: e.target.value === '' ? null : Number(e.target.value) })}
+          />
+        </label>
+        <div className="field">
+          <span className="field__label">My social media rule today</span>
+          <TextField value={d.socialIntent} onChange={(socialIntent) => set({ socialIntent })} placeholder="Create & share, don’t scroll" />
+          {!d.socialIntent && (
+            <div className="chips chips--small">
+              {SOCIAL_INTENTS.map((x) => (
+                <button key={x} className="chip" onClick={() => set({ socialIntent: x })}>{x}</button>
+              ))}
+            </div>
+          )}
+        </div>
+      </Card>
+
       {!d.morningDoneAt ? (
         <button className="btn btn--big" onClick={completeMorning}>Lock in my day ✓</button>
       ) : (
@@ -179,6 +274,24 @@ export default function Today({ onShare }: { onShare: () => void }) {
       <Card title="Evening review" icon="🌙" hint="Close the loop. Be honest, not harsh.">
         <TextField multiline label="Wins today" value={d.wins} onChange={(wins) => set({ wins })} placeholder="What went well? What am I proud of?" />
         <TextField multiline label="Lesson learned" value={d.lesson} onChange={(lesson) => set({ lesson })} placeholder="What would I do differently?" />
+        <label className="field">
+          <span className="field__label">Actual social media time (minutes){d.socialLimit != null ? ` — limit ${d.socialLimit}` : ''}</span>
+          <input
+            className="input"
+            type="number"
+            min={0}
+            step={5}
+            inputMode="numeric"
+            value={d.socialActual ?? ''}
+            placeholder="Check your screen-time settings"
+            onChange={(e) => set({ socialActual: e.target.value === '' ? null : Number(e.target.value) })}
+          />
+          {d.socialLimit != null && d.socialActual != null && (
+            <span className={`small ${d.socialActual <= d.socialLimit ? 'ok-text' : 'danger'}`}>
+              {d.socialActual <= d.socialLimit ? '✓ Within your limit' : `${d.socialActual - d.socialLimit} min over — what triggered it?`}
+            </span>
+          )}
+        </label>
         <div className="field">
           <span className="field__label">Rate your day</span>
           <Scale value={d.rating} onChange={(rating) => set({ rating })} max={10} />

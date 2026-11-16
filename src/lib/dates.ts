@@ -34,3 +34,6 @@ export const dayOfYear = (key: string) => {
   const start = new Date(y, 0, 0).getTime();
   return Math.floor((new Date(y, m - 1, d).getTime() - start) / 86_400_000);
 };
+
+/** Monday of the week containing `key`. */
+export const weekStart = (key: string) => addDays(key, -weekdayIndex(key));

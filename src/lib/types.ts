@@ -24,6 +24,16 @@ export type DayEntry = {
   meals: Meals;
   water: number; // glasses
   training: Check & { notes: string };
+  // become the person who inspires me
+  futureSelf: string; // what would the person I'm becoming do today?
+  identityActions: Check[]; // 3 actions that prove who I am
+  // socials
+  connect: Check; // who I will connect with / reach out to
+  socialLimit: number | null; // planned minutes on social media
+  socialActual: number | null; // actual minutes (evening)
+  socialIntent: string; // create / share / avoid …
+  // coach challenge questions: question -> answer
+  answers: Record<string, string>;
   // evening reflection
   wins: string;
   lesson: string;
@@ -49,10 +59,22 @@ export type TrainingWeek = Workout[]; // index 0 = Monday .. 6 = Sunday
 
 export type PartnerMessage = { id: string; from: 'me' | 'partner'; text: string; at: string };
 
+export type WeekReview = {
+  weekStart: string; // Monday YYYY-MM-DD
+  score: number | null; // 1-10
+  biggestWin: string;
+  fellShort: string;
+  doDifferently: string;
+  nextFocus: string;
+  becameMore: string; // where did I act like the person I'm becoming?
+  doneAt: string | null;
+};
+
 export type AppState = {
   profile: Profile;
   days: Record<string, DayEntry>;
   goals: Goal[];
   training: TrainingWeek;
   messages: PartnerMessage[];
+  weeks: Record<string, WeekReview>;
 };

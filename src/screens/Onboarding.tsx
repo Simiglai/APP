@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '../lib/store';
-import { TextField } from '../ui';
+import { BrandLogo, TextField } from '../ui';
 
 const VALUE_OPTIONS = ['Discipline', 'Health', 'Family', 'Growth', 'Courage', 'Integrity', 'Freedom', 'Faith', 'Service', 'Excellence', 'Joy', 'Wealth', 'Love', 'Adventure'];
 
@@ -82,6 +82,7 @@ export default function Onboarding() {
 
   return (
     <div className="onboard">
+      <BrandLogo variant={step === 0 ? 'logo' : 'mark'} className="onboard__logo" />
       <div className="onboard__dots">
         {steps.map((_, i) => (
           <span key={i} className={i <= step ? 'is-on' : ''} />

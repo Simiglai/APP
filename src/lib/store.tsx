@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import type { AppState, DayEntry, Goal, PartnerMessage, Profile, TrainingWeek } from './types';
+import type { AppState, DayEntry, Goal, PartnerMessage, Profile, TrainingWeek, WeekReview } from './types';
 import { addDays, todayKey } from './dates';
 
 /**
@@ -21,6 +21,13 @@ export const emptyDay = (date: string): DayEntry => ({
   meals: { breakfast: '', lunch: '', dinner: '', snacks: '' },
   water: 0,
   training: { text: '', done: false, notes: '' },
+  futureSelf: '',
+  identityActions: [0, 1, 2].map(() => ({ text: '', done: false })),
+  connect: { text: '', done: false },
+  socialLimit: null,
+  socialActual: null,
+  socialIntent: '',
+  answers: {},
   wins: '',
   lesson: '',
   rating: null,
@@ -44,7 +51,19 @@ const initialState: AppState = {
   goals: [],
   training: defaultTraining,
   messages: [],
+  weeks: {},
 };
+
+export const emptyWeek = (weekStart: string): WeekReview => ({
+  weekStart,
+  score: null,
+  biggestWin: '',
+  fellShort: '',
+  doDifferently: '',
+  nextFocus: '',
+  becameMore: '',
+  doneAt: null,
+});
 
 const load = (): AppState => {
   try {
@@ -68,6 +87,8 @@ type Store = {
   updateGoal: (id: string, patch: Partial<Goal>) => void;
   setTraining: (week: TrainingWeek) => void;
   sendMessage: (text: string, from?: PartnerMessage['from']) => void;
+  getWeek: (weekStart: string) => WeekReview;
+  updateWeek: (weekStart: string, patch: Partial<WeekReview>) => void;
   streak: number;
   reset: () => void;
 };
@@ -97,10 +118,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }, [state]);
 
-  const getDay = useCallback((date: string) => state.days[date] ?? emptyDay(date), [state.days]);
+  const getDay = useCallback((date: string) => ({ ...emptyDay(date), ...state.days[date] }), [state.days]);
 
   const updateDay = useCallback((date: string, patch: Partial<DayEntry>) => {
-    setState((s) => ({ ...s, days: { ...s.days, [date]: { ...(s.days[date] ?? emptyDay(date)), ...patch } } }));
+    setState((s) => ({ ...s, days: { ...s.days, [date]: { ...emptyDay(date), ...s.days[date], ...patch } } }));
   }, []);
 
   const updateProfile = useCallback((patch: Partial<Profile>) => {
@@ -128,13 +149,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, messages: [...s.messages, { id: uid(), from, text, at: new Date().toISOString() }] }));
   }, []);
 
+  const getWeek = useCallback((weekStart: string) => ({ ...emptyWeek(weekStart), ...state.weeks[weekStart] }), [state.weeks]);
+
+  const updateWeek = useCallback((weekStart: string, patch: Partial<WeekReview>) => {
+    setState((s) => ({ ...s, weeks: { ...s.weeks, [weekStart]: { ...emptyWeek(weekStart), ...s.weeks[weekStart], ...patch } } }));
+  }, []);
+
   const reset = useCallback(() => setState(initialState), []);
 
   const streak = useMemo(() => computeStreak(state.days), [state.days]);
 
   const value = useMemo(
-    () => ({ state, getDay, updateDay, updateProfile, saveGoal, deleteGoal, updateGoal, setTraining, sendMessage, streak, reset }),
-    [state, getDay, updateDay, updateProfile, saveGoal, deleteGoal, updateGoal, setTraining, sendMessage, streak, reset],
+    () => ({ state, getDay, updateDay, updateProfile, saveGoal, deleteGoal, updateGoal, setTraining, sendMessage, getWeek, updateWeek, streak, reset }),
+    [state, getDay, updateDay, updateProfile, saveGoal, deleteGoal, updateGoal, setTraining, sendMessage, getWeek, updateWeek, streak, reset],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
@@ -154,8 +181,13 @@ export const daySummary = (name: string, d: DayEntry) => {
   if (top.length) lines.push('🏆 Top 3:', ...top.map((t) => `  ${t.done ? '☑' : '☐'} ${t.text}`));
   if (d.discipline.text) lines.push(`🔥 Discipline challenge: ${d.discipline.text}${d.discipline.done ? ' — DONE' : ''}`);
   if (d.training.text) lines.push(`💪 Training: ${d.training.text}${d.training.done ? ' — DONE' : ''}`);
+  const acts = d.identityActions.filter((t) => t.text);
+  if (acts.length) lines.push('🪞 Identity actions:', ...acts.map((t) => `  ${t.done ? '☑' : '☐'} ${t.text}`));
+  if (d.connect.text) lines.push(`🤝 Connect: ${d.connect.text}${d.connect.done ? ' — DONE' : ''}`);
+  if (d.socialLimit != null) lines.push(`📱 Social media: ${d.socialActual ?? '?'} / ${d.socialLimit} min`);
   const happy = d.happy.filter(Boolean);
   if (happy.length) lines.push(`😊 Happy about: ${happy.join(', ')}`);
+  for (const [q, a] of Object.entries(d.answers)) if (a.trim()) lines.push(`❓ ${q}\n   → ${a.trim()}`);
   if (d.rating) lines.push(`⭐ Day rating: ${d.rating}/10`);
   return lines.join('\n');
 };

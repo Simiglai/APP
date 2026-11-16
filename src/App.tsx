@@ -6,15 +6,17 @@ import Goals from './screens/Goals';
 import Train from './screens/Train';
 import Partner from './screens/Partner';
 import Me from './screens/Me';
+import WeeklyReview from './screens/WeeklyReview';
+import { IconGoals, IconMe, IconPartner, IconToday, IconTrain } from './icons';
 
 const TABS = [
-  { id: 'today', label: 'Today', icon: '☀️' },
-  { id: 'goals', label: 'Goals', icon: '🎯' },
-  { id: 'train', label: 'Train', icon: '💪' },
-  { id: 'partner', label: 'Partner', icon: '🤝' },
-  { id: 'me', label: 'Me', icon: '🪞' },
+  { id: 'today', label: 'Today', Icon: IconToday },
+  { id: 'goals', label: 'Goals', Icon: IconGoals },
+  { id: 'train', label: 'Train', Icon: IconTrain },
+  { id: 'partner', label: 'Coach', Icon: IconPartner },
+  { id: 'me', label: 'Me', Icon: IconMe },
 ] as const;
-type Tab = (typeof TABS)[number]['id'];
+type Tab = (typeof TABS)[number]['id'] | 'week';
 
 function Shell() {
   const { state } = useStore();
@@ -30,16 +32,17 @@ function Shell() {
   return (
     <>
       <main className="app">
-        {tab === 'today' && <Today onShare={() => go('partner')} />}
+        {tab === 'today' && <Today onShare={() => go('partner')} onWeekly={() => go('week')} />}
         {tab === 'goals' && <Goals />}
         {tab === 'train' && <Train />}
         {tab === 'partner' && <Partner />}
-        {tab === 'me' && <Me />}
+        {tab === 'me' && <Me onWeekly={() => go('week')} />}
+        {tab === 'week' && <WeeklyReview onBack={() => go('me')} />}
       </main>
       <nav className="tabbar">
         {TABS.map((t) => (
           <button key={t.id} className={tab === t.id ? 'is-on' : ''} onClick={() => go(t.id)}>
-            <span aria-hidden>{t.icon}</span>
+            <t.Icon />
             {t.label}
           </button>
         ))}

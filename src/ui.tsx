@@ -1,14 +1,12 @@
 import type { ReactNode } from 'react';
 
-export function Card({ title, icon, hint, children, accent }: { title?: string; icon?: string; hint?: string; children: ReactNode; accent?: boolean }) {
+// `icon` is accepted for readability at call sites but not rendered — the brand look is clean typography.
+export function Card({ title, hint, children, accent }: { title?: string; icon?: string; hint?: string; children: ReactNode; accent?: boolean }) {
   return (
     <section className={`card${accent ? ' card--accent' : ''}`}>
       {title && (
         <header className="card__head">
-          <h2>
-            {icon && <span className="card__icon" aria-hidden>{icon}</span>}
-            {title}
-          </h2>
+          <h2>{title}</h2>
           {hint && <p className="card__hint">{hint}</p>}
         </header>
       )}
@@ -67,5 +65,15 @@ export function Progress({ value }: { value: number }) {
     <div className="progress" aria-valuenow={Math.round(value * 100)} role="progressbar">
       <div className="progress__bar" style={{ width: `${Math.round(value * 100)}%` }} />
     </div>
+  );
+}
+
+/** Official Patrick Simiglai logo (from the design manual) — navy on light, white on dark. Never redrawn. */
+export function BrandLogo({ variant = 'mark', className }: { variant?: 'mark' | 'logo'; className?: string }) {
+  return (
+    <picture>
+      <source srcSet={`/brand/${variant}-white.png`} media="(prefers-color-scheme: dark)" />
+      <img className={className} src={`/brand/${variant}-navy.png`} alt="Patrick Simiglai" />
+    </picture>
   );
 }

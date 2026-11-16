@@ -49,3 +49,48 @@ export const DISCIPLINE_IDEAS = [
   'Say no to one thing that does not serve me',
   'No alcohol today',
 ];
+
+/**
+ * Coach challenge questions. Each day the client gets one "mirror" question
+ * (honest self-reflection) and one "challenge" question (push past comfort).
+ * Rotates daily; the two lists have co-prime lengths so pairs rarely repeat.
+ */
+const MIRROR_QUESTIONS = [
+  'What excuse did you use most this week — and is it actually true?',
+  'Where are you playing small right now?',
+  'If someone followed you around for a day, what would they say you prioritize?',
+  'What are you tolerating that you should not be?',
+  'Which habit is quietly stealing your future?',
+  'When did you last keep a promise to yourself that nobody else would have noticed?',
+  'What would you do differently if you knew nobody would judge you?',
+  'What story about yourself are you ready to stop telling?',
+  'Who in your life makes you better — and are you spending enough time with them?',
+  'What do you keep saying “someday” to?',
+  'Where are you choosing comfort over growth?',
+  'What would the 80-year-old version of you tell you about today?',
+  'Which of your values did you honor yesterday — and which did you ignore?',
+];
+
+const CHALLENGE_QUESTIONS = [
+  'What is the one uncomfortable conversation you need to have — and when will you have it?',
+  'What is the hardest thing on your list today? Do it first. When will you start?',
+  'What will you say no to today to protect your goals?',
+  'How can you go 10% harder in your training today than last time?',
+  'Who can you help or encourage today without expecting anything back?',
+  'What is one thing you can do today that scares you a little?',
+  'What would make today a 10/10 — and what is stopping you?',
+  'Where will you add one rep, one minute or one page more than you planned?',
+  'What would you attempt today if you knew you could not fail?',
+  'What can you finish today that you started and left?',
+  'Which temptation will test you today — and what is your plan when it shows up?',
+];
+
+export const dailyQuestions = (key: string) => {
+  const n = dayOfYear(key);
+  return [
+    { kind: 'Mirror', text: MIRROR_QUESTIONS[n % MIRROR_QUESTIONS.length] },
+    { kind: 'Challenge', text: CHALLENGE_QUESTIONS[n % CHALLENGE_QUESTIONS.length] },
+  ];
+};
+
+export const SOCIAL_INTENTS = ['Create & share, don’t scroll', 'Only after my top 3 is done', 'No social media today', 'Post my training', 'Reply to people, then close the app'];

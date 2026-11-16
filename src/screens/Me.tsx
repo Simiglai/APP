@@ -2,7 +2,7 @@ import { useStore } from '../lib/store';
 import { addDays, todayKey } from '../lib/dates';
 import { Card, TextField } from '../ui';
 
-export default function Me() {
+export default function Me({ onWeekly }: { onWeekly: () => void }) {
   const { state, updateProfile, getDay, streak, reset } = useStore();
   const p = state.profile;
 
@@ -25,6 +25,10 @@ export default function Me() {
         <div><strong>{disciplineWins}</strong><span>Discipline wins</span></div>
         <div><strong>{avgRating}</strong><span>Avg day rating</span></div>
       </div>
+
+      <Card title="Weekly review" icon="📅" hint="Every Sunday: score the week and set next week’s focus.">
+        <button className="btn" onClick={onWeekly}>Open weekly review</button>
+      </Card>
 
       <Card title="Last 14 days" icon="📊" hint="Mood (top) and energy (bottom)">
         <div className="bars">
