@@ -16,13 +16,13 @@ const MEAL_LABELS: [keyof Meals, string][] = [
 ];
 
 export default function Today({ onShare, onWeekly }: { onShare: () => void; onWeekly: () => void }) {
-  const { state, getDay, updateDay, streak, sendMessage } = useStore();
+  const { state, getDay, updateDay, streak, sendMessage, activeTier } = useStore();
   const [date, setDate] = useState(todayKey());
   const d = getDay(date);
   const set = (patch: Partial<DayEntry>) => updateDay(date, patch);
   const isToday = date === todayKey();
   const quote = dailyQuote(date);
-  const hasPrograms = hasFeature(state.profile.plan, 'training');
+  const hasPrograms = hasFeature(activeTier, 'training');
   // Clients without training programs plan their own session
   const plan = hasPrograms ? state.training[weekdayIndex(date)] : { title: '', details: '', rest: false };
   const name = state.profile.name;
@@ -308,7 +308,7 @@ export default function Today({ onShare, onWeekly }: { onShare: () => void; onWe
       </Card>
 
       <button className="btn btn--ghost" onClick={shareToPartner}>
-        Send check-in to {state.profile.partnerName || 'my partner'} →
+        Send check-in to {state.profile.partnerName} →
       </button>
     </div>
   );

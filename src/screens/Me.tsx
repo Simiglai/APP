@@ -1,11 +1,12 @@
 import { useStore } from '../lib/store';
 import { addDays, todayKey } from '../lib/dates';
 import { Card, TextField } from '../ui';
+import { supabase } from '../lib/supabase';
 import { planById } from '../lib/plans';
 import { formatPrice } from '../config';
 
 export default function Me({ onWeekly, onGoals, onMembership }: { onWeekly: () => void; onGoals: () => void; onMembership: () => void }) {
-  const { state, updateProfile, getDay, streak, reset } = useStore();
+  const { state, updateProfile, getDay, streak, activeTier, syncStatus } = useStore();
   const p = state.profile;
 
   const last14 = Array.from({ length: 14 }, (_, i) => getDay(addDays(todayKey(), i - 13)));
@@ -31,7 +32,7 @@ export default function Me({ onWeekly, onGoals, onMembership }: { onWeekly: () =
       <button className="card plan-badge" onClick={onMembership}>
         <span>
           <small className="muted">Your membership</small>
-          <strong>{planById(p.plan).name} · {formatPrice(planById(p.plan).price[p.currency], p.currency)}/mo</strong>
+          <strong>{activeTier ? `${planById(activeTier).name} · ${formatPrice(planById(activeTier).price[p.currency], p.currency)}/mo` : 'No active plan'}</strong>
         </span>
         <span className="edit-link">Manage ›</span>
       </button>
@@ -69,7 +70,10 @@ export default function Me({ onWeekly, onGoals, onMembership }: { onWeekly: () =
         <div className="chips">{p.values.map((v) => <span key={v} className="chip is-on">{v}</span>)}</div>
       </Card>
 
-      <button className="btn btn--link danger" onClick={() => confirm('Erase all data on this device?') && reset()}>Reset all data</button>
+      <p className="muted small center">
+        {{ loading: 'Loading…', synced: '✓ All changes saved', saving: 'Saving…', offline: 'Offline — changes will sync when you’re back online' }[syncStatus]}
+      </p>
+      <button className="btn btn--link danger" onClick={() => confirm('Log out on this device?') && supabase.auth.signOut()}>Log out</button>
     </div>
   );
 }

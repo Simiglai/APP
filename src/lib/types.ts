@@ -11,6 +11,8 @@ export type Profile = {
   values: string[];
   partnerName: string;
   plan: Tier;
+  planStatus: 'none' | 'trialing' | 'active' | 'past_due' | 'canceled';
+  role: 'client' | 'coach';
   currency: Currency;
   onboarded: boolean;
 };
@@ -62,7 +64,9 @@ export type Goal = {
 export type Workout = { title: string; details: string; rest: boolean };
 export type TrainingWeek = Workout[]; // index 0 = Monday .. 6 = Sunday
 
-export type PartnerMessage = { id: string; from: 'me' | 'partner'; text: string; at: string };
+export type PartnerMessage = { id: string; from: 'me' | 'partner'; text: string; at: string; readAt?: string | null; pending?: boolean };
+
+export type CoachEvent = { id: string; title: string; date: string; time?: string; location: string; description: string; signupUrl?: string };
 
 export type WeekReview = {
   weekStart: string; // Monday YYYY-MM-DD
@@ -84,6 +88,7 @@ export type AppState = {
   weeks: Record<string, WeekReview>;
   worksheets: Record<string, WorksheetEntry>;
   rsvps: string[]; // event ids
+  events: CoachEvent[];
 };
 
 export type WorksheetEntry = { values: Record<string, string | number>; updatedAt: string; sharedAt: string | null };

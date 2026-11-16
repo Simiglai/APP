@@ -36,7 +36,7 @@ const TEMPLATES: Record<string, TrainingWeek> = {
 };
 
 export default function Train({ onUpgrade }: { onUpgrade: () => void }) {
-  const { state, setTraining, getDay } = useStore();
+  const { state, setTraining, getDay, activeTier } = useStore();
   const [editing, setEditing] = useState<number | null>(null);
   const todayIdx = weekdayIndex(todayKey());
 
@@ -48,7 +48,7 @@ export default function Train({ onUpgrade }: { onUpgrade: () => void }) {
     return { key, done: getDay(key).training.done, label: WEEKDAYS[weekdayIndex(key)][0] };
   });
 
-  if (!hasFeature(state.profile.plan, 'training')) {
+  if (!hasFeature(activeTier, 'training')) {
     return (
       <div className="stack">
         <header className="page-head">

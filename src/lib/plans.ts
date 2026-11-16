@@ -50,6 +50,6 @@ export const PLANS: Plan[] = [
 export const stripeLookupKey = (id: Tier) => `ps_${id}_monthly`;
 
 export const planById = (id: Tier) => PLANS.find((p) => p.id === id) ?? PLANS[0];
-export const hasFeature = (tier: Tier, f: Feature) => planById(tier).features.includes(f);
+export const hasFeature = (tier: Tier | null, f: Feature) => (tier ? planById(tier).features.includes(f) : false);
 /** Cheapest plan that unlocks a feature. */
 export const planFor = (f: Feature) => PLANS.find((p) => p.features.includes(f)) ?? PLANS[PLANS.length - 1];

@@ -2,14 +2,13 @@ import { useState } from 'react';
 import { useStore } from '../lib/store';
 import { hasFeature } from '../lib/plans';
 import { WORKSHEETS, type Worksheet } from '../content/worksheets';
-import { EVENTS } from '../content/events';
 import { COACH_NAME } from '../config';
 import { Card, Locked, Scale, TextField } from '../ui';
 
 export default function Mind({ onUpgrade }: { onUpgrade: () => void }) {
-  const { state } = useStore();
+  const { state, activeTier } = useStore();
   const [open, setOpen] = useState<string | null>(null);
-  const tier = state.profile.plan;
+  const tier = activeTier;
   const sheet = WORKSHEETS.find((w) => w.id === open);
 
   if (sheet && hasFeature(tier, 'worksheets')) return <WorksheetView sheet={sheet} onBack={() => setOpen(null)} />;
@@ -58,7 +57,7 @@ export default function Mind({ onUpgrade }: { onUpgrade: () => void }) {
 
 function Events() {
   const { state, toggleRsvp } = useStore();
-  const upcoming = EVENTS.filter((e) => e.date >= new Date().toISOString().slice(0, 10)).sort((a, b) => a.date.localeCompare(b.date));
+  const upcoming = state.events.filter((e) => e.date >= new Date().toISOString().slice(0, 10)).sort((a, b) => a.date.localeCompare(b.date));
   return (
     <Card title="Events" hint="Train together. Grow together.">
       {upcoming.length === 0 && <p className="empty">No upcoming events yet — new events will appear here.</p>}

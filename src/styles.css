@@ -230,3 +230,27 @@ a.btn { text-decoration: none; display: inline-block; text-align: center; }
 .segmented { align-self: flex-start; display: inline-flex; padding: 3px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); }
 .segmented button { border: none; background: none; padding: 6px 16px; border-radius: 999px; font-weight: 700; font-size: 0.85rem; color: var(--muted); }
 .segmented button.is-on { background: var(--accent); color: var(--on-accent); }
+
+/* Auth, loading, errors */
+.splash { min-height: 100vh; display: grid; place-items: center; }
+.spinner { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--accent); animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.error { margin: 0; padding: 10px 12px; border-radius: 10px; background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); font-weight: 500; }
+.auth { min-height: auto; }
+.bubble.is-pending { opacity: 0.6; }
+
+/* Coach dashboard */
+.badge { display: inline-block; min-width: 20px; padding: 1px 6px; border-radius: 999px; background: var(--danger); color: #fff; font-size: 0.72rem; font-weight: 700; text-align: center; vertical-align: middle; }
+.flag { color: var(--danger); font-weight: 500; }
+.client-row small { display: block; }
+.daygrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.daygrid__cell { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 0; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); }
+.daygrid__cell small { color: var(--muted); font-size: 0.7rem; }
+.daygrid__cell.is-full { background: color-mix(in srgb, var(--ok) 22%, var(--surface)); border-color: var(--ok); }
+.daygrid__cell.is-half { background: color-mix(in srgb, var(--ok) 9%, var(--surface)); }
+.daygrid__cell.is-open { outline: 2px solid var(--accent); }
+.day-detail pre { white-space: pre-wrap; font: inherit; margin: 0; }
+.day-detail p, .review p { margin: 4px 0 0; }
+.review { padding: 10px 0; border-bottom: 1px solid var(--line); }
+.review:last-child { border-bottom: none; }
+.review summary { cursor: pointer; }

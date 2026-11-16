@@ -75,7 +75,7 @@ export default function WeeklyReview({ onBack }: { onBack: () => void }) {
       </Card>
 
       {w.doneAt ? (
-        <p className="done-banner">✓ Review complete and sent to {state.profile.partnerName || 'your coach'}.</p>
+        <p className="done-banner">✓ Review complete and sent to {state.profile.partnerName}.</p>
       ) : (
         <button className="btn btn--big" disabled={w.score == null} onClick={finish}>Complete & send to coach</button>
       )}

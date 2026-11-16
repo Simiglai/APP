@@ -65,16 +65,6 @@ export default function Onboarding() {
       ),
       ok: p.values.length > 0,
     },
-    {
-      title: 'Your accountability partner',
-      body: (
-        <>
-          <p className="muted">Someone you check in with every day. You can add or change this later.</p>
-          <TextField label="Partner’s name" value={p.partnerName} onChange={(partnerName) => updateProfile({ partnerName })} placeholder="e.g. Coach Alex" />
-        </>
-      ),
-      ok: true,
-    },
   ];
 
   const s = steps[step];
