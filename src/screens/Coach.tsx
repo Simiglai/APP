@@ -275,7 +275,9 @@ function Thread({ clientId, coachId, name }: { clientId: string; coachId: string
     };
   }, [clientId]);
 
-  useEffect(() => end.current?.scrollIntoView({ block: 'nearest' }), [msgs.length]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ block: 'nearest' });
+  }, [msgs.length]);
 
   const send = async () => {
     const body = text.trim();

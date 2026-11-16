@@ -46,6 +46,23 @@ cd supabase/tests
 psql -d <empty db> -v ON_ERROR_STOP=1 -f local_stub.sql -f ../migrations/20261116000000_init.sql -f rls_test.sql
 ```
 
+## Accounts, coach & payments
+
+- **Login**: email + password (Supabase Auth). Each user's data is cached on the device and synced to Supabase (`src/lib/store.tsx`, `src/lib/sync.ts`); unsent changes survive restarts and are retried.
+- **Coach**: an account with `role = 'coach'` gets the coach dashboard instead of the client app — clients with attention flags (no check-in for 2+ days, low mood/energy, failed payment, unread messages), 14-day check-in grid, weekly reviews, shared worksheets, live chat, plan override and an events manager. Make an account coach in the Supabase SQL editor:
+  `update profiles set role = 'coach' where id = (select id from auth.users where email = 'you@example.com');`
+- **Payments** (Supabase Edge Functions in `supabase/functions/`):
+  - `create-checkout` — Stripe Checkout for the chosen plan in DKK or USD
+  - `customer-portal` — switch plan, update card, cancel, receipts
+  - `stripe-webhook` — keeps `profiles.plan` / `plan_status` in sync; events are verified by re-fetching them from Stripe
+  - Needs the Supabase secret `STRIPE_SECRET_KEY`. Clients without an active plan see the plan picker.
+
+### Before launch
+1. Rotate the Stripe test key, then repeat setup with live keys (`scripts/stripe_setup.py`, webhook endpoint, billing portal).
+2. Custom SMTP in Supabase (e.g. Resend) → turn email confirmation back on and enable password reset.
+3. Host the app (e.g. Vercel/Netlify) and set Supabase Auth site URL + redirect URLs to the real domain.
+4. Create Patrick's own account and set `role = 'coach'`.
+
 ## Brand
 
 Follows the Patrick Simiglai design manual (2022): Montserrat (bold headings, light body, medium UI), navy `#12264a`, dark grey `#313132`, light grey `#ececec`, black and white. The logo files in `public/brand/` are extracted directly from the manual — never redraw them. Light mode = navy on light grey; dark mode = white on navy.

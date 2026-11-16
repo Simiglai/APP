@@ -14,7 +14,9 @@ export default function Partner() {
   const today = getDay(todayKey());
   const end = useRef<HTMLDivElement>(null);
 
-  useEffect(() => end.current?.scrollIntoView({ block: 'nearest' }), [state.messages.length]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ block: 'nearest' });
+  }, [state.messages.length]);
 
   const send = (msg: string) => {
     if (!msg.trim()) return;

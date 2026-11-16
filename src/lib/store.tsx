@@ -289,6 +289,11 @@ export function StoreProvider({ userId, children }: { userId: string; children: 
         const m = toMessage(payload.new as Parameters<typeof toMessage>[0], userId);
         setState((s) => (s.messages.some((x) => x.id === m.id) ? s : { ...s, messages: [...s.messages, m] }));
       })
+      // "seen" receipts: the coach marking my messages as read
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: `client_id=eq.${userId}` }, (payload) => {
+        const row = payload.new as { id: string; read_at: string | null };
+        setState((s) => ({ ...s, messages: s.messages.map((x) => (x.id === row.id ? { ...x, readAt: row.read_at } : x)) }));
+      })
       .subscribe();
     return () => {
       document.removeEventListener('visibilitychange', onFocus);
