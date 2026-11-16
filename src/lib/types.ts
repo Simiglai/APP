@@ -1,4 +1,5 @@
 import type { Tier } from './plans';
+import type { Currency } from '../config';
 
 export type Check = { text: string; done: boolean };
 
@@ -10,6 +11,7 @@ export type Profile = {
   values: string[];
   partnerName: string;
   plan: Tier;
+  currency: Currency;
   onboarded: boolean;
 };
 

@@ -22,16 +22,29 @@ Defined in `src/lib/plans.ts` (prices/features) — each higher tier includes ev
 
 | Plan | Price | Unlocks |
 |---|---|---|
-| **Accountable** | $50/mo | Daily check-in & planner, challenge questions, identity work, coach chat, weekly review, goals |
-| **Perform** | $300/mo | + personal training programs, TrainingPeaks connection |
-| **Elite** | $500/mo | + mental worksheets, events |
-| **Private Personal Advisory** | Book a call | Set `BOOKING_URL` in `src/config.ts` (empty = request sent via coach chat) |
+| **Accountable** | $50 / 349 kr. per month | Daily check-in & planner, challenge questions, identity work, coach chat, weekly review, goals |
+| **Perform** | $300 / 1.999 kr. per month | + personal training programs, TrainingPeaks connection |
+| **Elite** | $500 / 3.499 kr. per month | + mental worksheets, events |
+| **Private Personal Advisory** | Free 30-min call | Opens the Calendly link in `BOOKING_URL` (`src/config.ts`) |
 
 Locked features show an upgrade card. Plan switching is instant in preview mode until Stripe payments are connected.
 
 - Mental worksheets: `src/content/worksheets.ts` (fear setting, limiting beliefs, future-self letter, wheel of life, pressure plan, values & non-negotiables) — add new ones there.
 - Events: `src/content/events.ts`.
 - TrainingPeaks: the API requires an approved partner application (api.trainingpeaks.com/request-access). Until approved, the Train tab links to TrainingPeaks and clients tick sessions off in the app.
+
+Prices exist in USD and DKK; Danish-language phones default to DKK and clients can switch on the membership page.
+
+## Database (Supabase)
+
+`supabase/migrations/` holds the schema: profiles (role, plan, billing), daily check-ins, goals, weekly reviews, training programs, worksheets, coach chat, events + RSVPs and a `coach_client_overview` view for the coach dashboard. Row-level security: clients only see their own data, the coach sees everyone, clients can't change their own plan/role, and Perform/Elite features are enforced in the database.
+
+Test locally on plain Postgres:
+
+```bash
+cd supabase/tests
+psql -d <empty db> -v ON_ERROR_STOP=1 -f local_stub.sql -f ../migrations/20261116000000_init.sql -f rls_test.sql
+```
 
 ## Brand
 

@@ -2,10 +2,12 @@ export type Tier = 'accountable' | 'perform' | 'elite';
 
 export type Feature = 'checkin' | 'coach' | 'weekly' | 'goals' | 'training' | 'trainingpeaks' | 'worksheets' | 'events';
 
+import type { Currency } from '../config';
+
 export type Plan = {
   id: Tier;
   name: string;
-  price: number; // per month
+  price: Record<Currency, number>; // per month
   tagline: string;
   features: Feature[];
   bullets: string[];
@@ -15,7 +17,7 @@ export const PLANS: Plan[] = [
   {
     id: 'accountable',
     name: 'Accountable',
-    price: 50,
+    price: { USD: 50, DKK: 349 },
     tagline: 'Show up every day — with someone watching.',
     features: ['checkin', 'coach', 'weekly', 'goals'],
     bullets: [
@@ -29,7 +31,7 @@ export const PLANS: Plan[] = [
   {
     id: 'perform',
     name: 'Perform',
-    price: 300,
+    price: { USD: 300, DKK: 1999 },
     tagline: 'The app + personal training programs.',
     features: ['checkin', 'coach', 'weekly', 'goals', 'training', 'trainingpeaks'],
     bullets: ['Everything in Accountable', 'Personal training programs', 'TrainingPeaks connection', 'Training tracking & progress'],
@@ -37,7 +39,7 @@ export const PLANS: Plan[] = [
   {
     id: 'elite',
     name: 'Elite',
-    price: 500,
+    price: { USD: 500, DKK: 3499 },
     tagline: 'Body, mind and community — the full system.',
     features: ['checkin', 'coach', 'weekly', 'goals', 'training', 'trainingpeaks', 'worksheets', 'events'],
     bullets: ['Everything in Perform', 'Mental worksheets & mindset work', 'Access to events'],

@@ -226,3 +226,7 @@ strong, b { font-weight: 700; }
 .event__body { display: flex; flex-direction: column; gap: 4px; }
 .event__body p { margin: 0; }
 a.btn { text-decoration: none; display: inline-block; text-align: center; }
+
+.segmented { align-self: flex-start; display: inline-flex; padding: 3px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); }
+.segmented button { border: none; background: none; padding: 6px 16px; border-radius: 999px; font-weight: 700; font-size: 0.85rem; color: var(--muted); }
+.segmented button.is-on { background: var(--accent); color: var(--on-accent); }

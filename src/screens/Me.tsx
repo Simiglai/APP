@@ -2,7 +2,7 @@ import { useStore } from '../lib/store';
 import { addDays, todayKey } from '../lib/dates';
 import { Card, TextField } from '../ui';
 import { planById } from '../lib/plans';
-import { CURRENCY } from '../config';
+import { formatPrice } from '../config';
 
 export default function Me({ onWeekly, onGoals, onMembership }: { onWeekly: () => void; onGoals: () => void; onMembership: () => void }) {
   const { state, updateProfile, getDay, streak, reset } = useStore();
@@ -31,7 +31,7 @@ export default function Me({ onWeekly, onGoals, onMembership }: { onWeekly: () =
       <button className="card plan-badge" onClick={onMembership}>
         <span>
           <small className="muted">Your membership</small>
-          <strong>{planById(p.plan).name} · {CURRENCY}{planById(p.plan).price}/mo</strong>
+          <strong>{planById(p.plan).name} · {formatPrice(planById(p.plan).price[p.currency], p.currency)}/mo</strong>
         </span>
         <span className="edit-link">Manage ›</span>
       </button>

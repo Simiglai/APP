@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { AppState, DayEntry, Goal, PartnerMessage, Profile, TrainingWeek, WeekReview, WorksheetEntry } from './types';
 import { addDays, todayKey } from './dates';
+import { defaultCurrency } from '../config';
 
 /**
  * Local-first store. Everything is persisted to localStorage for now.
@@ -46,7 +47,7 @@ const defaultTraining: TrainingWeek = [
 ];
 
 const initialState: AppState = {
-  profile: { name: '', identity: '', becoming: '', purpose: '', values: [], partnerName: '', plan: 'accountable', onboarded: false },
+  profile: { name: '', identity: '', becoming: '', purpose: '', values: [], partnerName: '', plan: 'accountable', currency: defaultCurrency(), onboarded: false },
   days: {},
   goals: [],
   training: defaultTraining,

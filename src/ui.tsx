@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { CURRENCY } from './config';
+import { formatPrice } from './config';
+import { useStore } from './lib/store';
 import { planFor, type Feature } from './lib/plans';
 
 // `icon` is accepted for readability at call sites but not rendered — the brand look is clean typography.
@@ -83,9 +84,10 @@ export function BrandLogo({ variant = 'mark', className }: { variant?: 'mark' | 
 /** Shown in place of a feature the client's plan does not include. */
 export function Locked({ feature, title, children, onUpgrade }: { feature: Feature; title: string; children?: ReactNode; onUpgrade: () => void }) {
   const plan = planFor(feature);
+  const { state } = useStore();
   return (
     <section className="card card--accent locked">
-      <span className="tag tag--plan">{plan.name} · {CURRENCY}{plan.price}/mo</span>
+      <span className="tag tag--plan">{plan.name} · {formatPrice(plan.price[state.profile.currency], state.profile.currency)}/mo</span>
       <h2 className="locked__title">{title}</h2>
       {children && <div className="locked__body">{children}</div>}
       <button className="btn btn--invert" onClick={onUpgrade}>Unlock with {plan.name}</button>
