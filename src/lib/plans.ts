@@ -46,6 +46,9 @@ export const PLANS: Plan[] = [
   },
 ];
 
+/** Stripe price lookup key for a plan (same in test and live mode — see scripts/stripe_setup.py). */
+export const stripeLookupKey = (id: Tier) => `ps_${id}_monthly`;
+
 export const planById = (id: Tier) => PLANS.find((p) => p.id === id) ?? PLANS[0];
 export const hasFeature = (tier: Tier, f: Feature) => planById(tier).features.includes(f);
 /** Cheapest plan that unlocks a feature. */
