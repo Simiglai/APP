@@ -1,8 +1,10 @@
 import { useStore } from '../lib/store';
 import { addDays, todayKey } from '../lib/dates';
 import { Card, TextField } from '../ui';
+import { planById } from '../lib/plans';
+import { CURRENCY } from '../config';
 
-export default function Me({ onWeekly }: { onWeekly: () => void }) {
+export default function Me({ onWeekly, onGoals, onMembership }: { onWeekly: () => void; onGoals: () => void; onMembership: () => void }) {
   const { state, updateProfile, getDay, streak, reset } = useStore();
   const p = state.profile;
 
@@ -25,6 +27,18 @@ export default function Me({ onWeekly }: { onWeekly: () => void }) {
         <div><strong>{disciplineWins}</strong><span>Discipline wins</span></div>
         <div><strong>{avgRating}</strong><span>Avg day rating</span></div>
       </div>
+
+      <button className="card plan-badge" onClick={onMembership}>
+        <span>
+          <small className="muted">Your membership</small>
+          <strong>{planById(p.plan).name} · {CURRENCY}{planById(p.plan).price}/mo</strong>
+        </span>
+        <span className="edit-link">Manage ›</span>
+      </button>
+
+      <Card title="Goals" hint={`${state.goals.length} active goal${state.goals.length === 1 ? '' : 's'} — your daily Top 3 should move these forward.`}>
+        <button className="btn" onClick={onGoals}>Open goals</button>
+      </Card>
 
       <Card title="Weekly review" icon="📅" hint="Every Sunday: score the week and set next week’s focus.">
         <button className="btn" onClick={onWeekly}>Open weekly review</button>

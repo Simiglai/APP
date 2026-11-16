@@ -193,3 +193,36 @@ strong, b { font-weight: 700; }
 .onboard__logo { width: 120px; height: auto; display: block; margin-bottom: 8px; }
 .card__head h2 { text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.85rem; }
 .why { font-weight: 300; }
+
+/* Plans & locked features */
+.btn--invert { background: #fff; color: var(--navy); }
+.tag--plan { background: rgba(255, 255, 255, 0.15); color: #fff; }
+.locked__title { color: #fff; font-size: 1.25rem; text-transform: none; letter-spacing: 0; }
+.locked p, .locked__body p { margin: 0; opacity: 0.9; }
+.plan__head { display: flex; justify-content: space-between; align-items: center; }
+.plan__head h2 { font-size: 1.25rem; }
+.plan--current { border: 2px solid var(--accent); }
+.plan__price { margin: 0; font-size: 2rem; font-weight: 700; color: var(--heading); }
+.plan__price span { font-size: 0.9rem; font-weight: 300; color: var(--muted); }
+.plan__list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.plan__list li::marker { content: '✓  '; color: var(--accent); font-weight: 700; }
+.plan-badge { display: flex; flex-direction: row; justify-content: space-between; align-items: center; text-align: left; }
+.plan-badge span:first-child { display: flex; flex-direction: column; }
+.center { text-align: center; }
+
+/* Lists, worksheets, events */
+.list { display: flex; flex-direction: column; }
+.list__item { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 0; background: none; border: none; border-bottom: 1px solid var(--line); text-align: left; }
+.list__item:last-child { border-bottom: none; }
+.list__item > span:first-child { display: flex; flex-direction: column; gap: 2px; }
+.list__item > span:last-child { font-size: 1.4rem; color: var(--muted); }
+.sheet-heading { padding-top: 8px; border-top: 1px solid var(--line); }
+.sheet-heading h2 { text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.85rem; }
+.event { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.event:last-child { border-bottom: none; }
+.event__date { flex: none; width: 54px; height: 58px; border-radius: 12px; background: var(--accent); color: var(--on-accent); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.event__date strong { font-size: 1.3rem; line-height: 1; }
+.event__date small { text-transform: uppercase; font-size: 0.7rem; font-weight: 700; }
+.event__body { display: flex; flex-direction: column; gap: 4px; }
+.event__body p { margin: 0; }
+a.btn { text-decoration: none; display: inline-block; text-align: center; }

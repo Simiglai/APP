@@ -1,3 +1,5 @@
+import type { Tier } from './plans';
+
 export type Check = { text: string; done: boolean };
 
 export type Profile = {
@@ -7,6 +9,7 @@ export type Profile = {
   purpose: string; // Life purpose / mission
   values: string[];
   partnerName: string;
+  plan: Tier;
   onboarded: boolean;
 };
 
@@ -77,4 +80,8 @@ export type AppState = {
   training: TrainingWeek;
   messages: PartnerMessage[];
   weeks: Record<string, WeekReview>;
+  worksheets: Record<string, WorksheetEntry>;
+  rsvps: string[]; // event ids
 };
+
+export type WorksheetEntry = { values: Record<string, string | number>; updatedAt: string; sharedAt: string | null };

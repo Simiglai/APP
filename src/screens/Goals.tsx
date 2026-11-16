@@ -15,7 +15,7 @@ const iconFor = (a: GoalArea) => AREAS.find((x) => x.area === a)?.icon ?? '🎯'
 
 const blank = { title: '', area: 'Health' as GoalArea, why: '', targetDate: '', milestones: [{ text: '', done: false }] };
 
-export default function Goals() {
+export default function Goals({ onBack }: { onBack: () => void }) {
   const { state, saveGoal, updateGoal, deleteGoal } = useStore();
   const [draft, setDraft] = useState<typeof blank | null>(null);
 
@@ -28,6 +28,7 @@ export default function Goals() {
   return (
     <div className="stack">
       <header className="page-head">
+        <button className="btn btn--link" style={{ alignSelf: 'flex-start' }} onClick={onBack}>‹ Back</button>
         <h1>Goals</h1>
         <p className="muted">Big goals, broken into milestones. Your daily Top 3 should move these forward.</p>
       </header>

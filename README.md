@@ -7,13 +7,31 @@ A daily planner + accountability app for Patrick Simiglai's coaching clients —
 | Tab | What it does |
 |---|---|
 | **Today** | Daily motivation quote + identity reminder + reflection prompt · mood / energy / sleep check-in · **2 daily challenge questions** (Mirror + Challenge) · **Be the person who inspires you** (what would my future self do today + 3 identity actions) · **purpose for the day** · **top 3 goals** · **5 things that make me happy** · **1 discipline challenge** (with suggestions) · **fuel plan** (breakfast, lunch, dinner, snacks + water) · today's **training** session · **socials** (who I'll connect with, social media limit + rule) · "Lock in my day" · evening review (wins, lesson, actual social media time vs limit, 1–10 rating) · Sunday weekly-review prompt · browse previous days |
-| **Goals** | Long-term goals by life area (Health, Career, Relationships, Mind, Finance, Purpose) with a *why*, target date and milestone progress |
+| **Goals** (under Me) | Long-term goals by life area (Health, Career, Relationships, Mind, Finance, Purpose) with a *why*, target date and milestone progress |
+| **Mind** | Mental worksheets (shareable with the coach) and events — Elite |
 | **Train** | Weekly training plan (editable per day), 3 templates (beginner, fat loss, 10k running), last-7-days completion |
 | **Coach** | Accountability with the coach: today's status, post your check-in, quick nudges, share via WhatsApp/iMessage (Web Share / clipboard) |
 | **Weekly review** | Week stats + score, biggest win, where I fell short, when I acted like who I'm becoming, what I'll do differently, next week's focus — sent to the coach |
 | **Me** | **Who am I?** (identity) · **What can I become?** · purpose · core values · streak, check-ins, discipline wins, avg rating, 14-day mood/energy chart |
 
 Onboarding walks a new client through name → identity → who they are becoming + purpose → core values → partner.
+
+## Membership tiers
+
+Defined in `src/lib/plans.ts` (prices/features) — each higher tier includes everything below it.
+
+| Plan | Price | Unlocks |
+|---|---|---|
+| **Accountable** | $50/mo | Daily check-in & planner, challenge questions, identity work, coach chat, weekly review, goals |
+| **Perform** | $300/mo | + personal training programs, TrainingPeaks connection |
+| **Elite** | $500/mo | + mental worksheets, events |
+| **Private Personal Advisory** | Book a call | Set `BOOKING_URL` in `src/config.ts` (empty = request sent via coach chat) |
+
+Locked features show an upgrade card. Plan switching is instant in preview mode until Stripe payments are connected.
+
+- Mental worksheets: `src/content/worksheets.ts` (fear setting, limiting beliefs, future-self letter, wheel of life, pressure plan, values & non-negotiables) — add new ones there.
+- Events: `src/content/events.ts`.
+- TrainingPeaks: the API requires an approved partner application (api.trainingpeaks.com/request-access). Until approved, the Train tab links to TrainingPeaks and clients tick sessions off in the app.
 
 ## Brand
 

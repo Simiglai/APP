@@ -4,6 +4,7 @@ import { addDays, prettyDate, todayKey, weekdayIndex } from '../lib/dates';
 import { DISCIPLINE_IDEAS, SOCIAL_INTENTS, dailyPrompt, dailyQuestions, dailyQuote } from '../lib/motivation';
 import type { DayEntry, Meals } from '../lib/types';
 import { BrandLogo, Card, CheckRow, Scale, TextField } from '../ui';
+import { hasFeature } from '../lib/plans';
 
 const MOODS = ['😞', '😕', '😐', '🙂', '😄'];
 const ENERGY = ['🪫', '😴', '⚡', '⚡⚡', '🔥'];
@@ -21,7 +22,9 @@ export default function Today({ onShare, onWeekly }: { onShare: () => void; onWe
   const set = (patch: Partial<DayEntry>) => updateDay(date, patch);
   const isToday = date === todayKey();
   const quote = dailyQuote(date);
-  const plan = state.training[weekdayIndex(date)];
+  const hasPrograms = hasFeature(state.profile.plan, 'training');
+  // Clients without training programs plan their own session
+  const plan = hasPrograms ? state.training[weekdayIndex(date)] : { title: '', details: '', rest: false };
   const name = state.profile.name;
 
   const questions = dailyQuestions(date);
@@ -217,11 +220,12 @@ export default function Today({ onShare, onWeekly }: { onShare: () => void; onWe
         </div>
       </Card>
 
-      <Card title="Training" icon="💪" hint={`Plan for ${prettyDate(date).split(',')[0]}: ${plan.title}`}>
-        <p className="muted small">{plan.details}</p>
+      <Card title="Training" icon="💪" hint={hasPrograms ? `Plan for ${prettyDate(date).split(',')[0]}: ${plan.title}` : 'What will you do for your body today?'}>
+        {plan.details && <p className="muted small">{plan.details}</p>}
         <CheckRow
           done={d.training.done}
           text={d.training.text || plan.title}
+          placeholder="e.g. 45 min run, gym upper body, yoga…"
           onToggle={() => set({ training: { ...d.training, text: d.training.text || plan.title, done: !d.training.done } })}
           onText={(text) => set({ training: { ...d.training, text } })}
         />

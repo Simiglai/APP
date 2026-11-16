@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react';
+import { CURRENCY } from './config';
+import { planFor, type Feature } from './lib/plans';
 
 // `icon` is accepted for readability at call sites but not rendered — the brand look is clean typography.
 export function Card({ title, hint, children, accent }: { title?: string; icon?: string; hint?: string; children: ReactNode; accent?: boolean }) {
@@ -75,5 +77,18 @@ export function BrandLogo({ variant = 'mark', className }: { variant?: 'mark' | 
       <source srcSet={`/brand/${variant}-white.png`} media="(prefers-color-scheme: dark)" />
       <img className={className} src={`/brand/${variant}-navy.png`} alt="Patrick Simiglai" />
     </picture>
+  );
+}
+
+/** Shown in place of a feature the client's plan does not include. */
+export function Locked({ feature, title, children, onUpgrade }: { feature: Feature; title: string; children?: ReactNode; onUpgrade: () => void }) {
+  const plan = planFor(feature);
+  return (
+    <section className="card card--accent locked">
+      <span className="tag tag--plan">{plan.name} · {CURRENCY}{plan.price}/mo</span>
+      <h2 className="locked__title">{title}</h2>
+      {children && <div className="locked__body">{children}</div>}
+      <button className="btn btn--invert" onClick={onUpgrade}>Unlock with {plan.name}</button>
+    </section>
   );
 }

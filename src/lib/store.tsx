@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import type { AppState, DayEntry, Goal, PartnerMessage, Profile, TrainingWeek, WeekReview } from './types';
+import type { AppState, DayEntry, Goal, PartnerMessage, Profile, TrainingWeek, WeekReview, WorksheetEntry } from './types';
 import { addDays, todayKey } from './dates';
 
 /**
@@ -46,12 +46,14 @@ const defaultTraining: TrainingWeek = [
 ];
 
 const initialState: AppState = {
-  profile: { name: '', identity: '', becoming: '', purpose: '', values: [], partnerName: '', onboarded: false },
+  profile: { name: '', identity: '', becoming: '', purpose: '', values: [], partnerName: '', plan: 'accountable', onboarded: false },
   days: {},
   goals: [],
   training: defaultTraining,
   messages: [],
   weeks: {},
+  worksheets: {},
+  rsvps: [],
 };
 
 export const emptyWeek = (weekStart: string): WeekReview => ({
@@ -69,7 +71,8 @@ const load = (): AppState => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return initialState;
-    return { ...initialState, ...JSON.parse(raw) };
+    const saved = JSON.parse(raw) as Partial<AppState>;
+    return { ...initialState, ...saved, profile: { ...initialState.profile, ...saved.profile } };
   } catch {
     return initialState;
   }
@@ -87,6 +90,8 @@ type Store = {
   updateGoal: (id: string, patch: Partial<Goal>) => void;
   setTraining: (week: TrainingWeek) => void;
   sendMessage: (text: string, from?: PartnerMessage['from']) => void;
+  saveWorksheet: (id: string, patch: Partial<WorksheetEntry>) => void;
+  toggleRsvp: (eventId: string) => void;
   getWeek: (weekStart: string) => WeekReview;
   updateWeek: (weekStart: string, patch: Partial<WeekReview>) => void;
   streak: number;
@@ -155,13 +160,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, weeks: { ...s.weeks, [weekStart]: { ...emptyWeek(weekStart), ...s.weeks[weekStart], ...patch } } }));
   }, []);
 
+  const saveWorksheet = useCallback((id: string, patch: Partial<WorksheetEntry>) => {
+    setState((s) => {
+      const prev = s.worksheets[id] ?? { values: {}, updatedAt: '', sharedAt: null };
+      return { ...s, worksheets: { ...s.worksheets, [id]: { ...prev, ...patch, updatedAt: new Date().toISOString() } } };
+    });
+  }, []);
+
+  const toggleRsvp = useCallback((eventId: string) => {
+    setState((s) => ({ ...s, rsvps: s.rsvps.includes(eventId) ? s.rsvps.filter((x) => x !== eventId) : [...s.rsvps, eventId] }));
+  }, []);
+
   const reset = useCallback(() => setState(initialState), []);
 
   const streak = useMemo(() => computeStreak(state.days), [state.days]);
 
   const value = useMemo(
-    () => ({ state, getDay, updateDay, updateProfile, saveGoal, deleteGoal, updateGoal, setTraining, sendMessage, getWeek, updateWeek, streak, reset }),
-    [state, getDay, updateDay, updateProfile, saveGoal, deleteGoal, updateGoal, setTraining, sendMessage, getWeek, updateWeek, streak, reset],
+    () => ({ state, getDay, updateDay, updateProfile, saveGoal, deleteGoal, updateGoal, setTraining, sendMessage, saveWorksheet, toggleRsvp, getWeek, updateWeek, streak, reset }),
+    [state, getDay, updateDay, updateProfile, saveGoal, deleteGoal, updateGoal, setTraining, sendMessage, saveWorksheet, toggleRsvp, getWeek, updateWeek, streak, reset],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

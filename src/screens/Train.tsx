@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useStore } from '../lib/store';
 import { WEEKDAYS, addDays, todayKey, weekdayIndex } from '../lib/dates';
 import type { TrainingWeek } from '../lib/types';
-import { Card, TextField } from '../ui';
+import { Card, Locked, TextField } from '../ui';
+import { hasFeature } from '../lib/plans';
 
 const TEMPLATES: Record<string, TrainingWeek> = {
   'Beginner — 3 days': [
@@ -34,7 +35,7 @@ const TEMPLATES: Record<string, TrainingWeek> = {
   ],
 };
 
-export default function Train() {
+export default function Train({ onUpgrade }: { onUpgrade: () => void }) {
   const { state, setTraining, getDay } = useStore();
   const [editing, setEditing] = useState<number | null>(null);
   const todayIdx = weekdayIndex(todayKey());
@@ -47,12 +48,34 @@ export default function Train() {
     return { key, done: getDay(key).training.done, label: WEEKDAYS[weekdayIndex(key)][0] };
   });
 
+  if (!hasFeature(state.profile.plan, 'training')) {
+    return (
+      <div className="stack">
+        <header className="page-head">
+          <h1>Training</h1>
+          <p className="muted">You still log your training every day in your check-in.</p>
+        </header>
+        <Locked feature="training" title="Personal training programs" onUpgrade={onUpgrade}>
+          <p>A weekly program built for your goal, synced with TrainingPeaks, with progress tracking.</p>
+        </Locked>
+      </div>
+    );
+  }
+
   return (
     <div className="stack">
       <header className="page-head">
         <h1>Training plan</h1>
         <p className="muted">Your week at a glance. Today’s session shows up in your daily check-in.</p>
       </header>
+
+      <Card title="TrainingPeaks" hint="Your workouts from TrainingPeaks will sync here automatically.">
+        <p className="muted small">Automatic sync is being set up. Until then, open your workouts in TrainingPeaks and tick them off here.</p>
+        <div className="row">
+          <button className="btn" disabled>Connect TrainingPeaks · soon</button>
+          <a className="btn btn--ghost" href="https://app.trainingpeaks.com" target="_blank" rel="noopener">Open TrainingPeaks</a>
+        </div>
+      </Card>
 
       <Card title="Last 7 days" icon="📈">
         <div className="week-dots">
