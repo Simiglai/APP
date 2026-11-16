@@ -12,3 +12,10 @@ export const defaultCurrency = (): Currency =>
 
 export const formatPrice = (amount: number, currency: Currency) =>
   currency === 'DKK' ? `${amount.toLocaleString('da-DK')} kr.` : `$${amount.toLocaleString('en-US')}`;
+
+/**
+ * Supabase project "PS Daily" (EU — Frankfurt). The publishable key is designed to be public:
+ * it ships inside the app and all data access is protected by row-level security.
+ */
+export const SUPABASE_URL = 'https://olpjikegieacdcqzenvn.supabase.co';
+export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_kQh6ZfmaGeEVd5vt87EtVA_TYdhPlso';
