@@ -1,6 +1,7 @@
 import { dayOfYear } from './dates';
+import { byLang } from '../i18n';
 
-const QUOTES: { text: string; by: string }[] = [
+const QUOTES_EN: { text: string; by: string }[] = [
   { text: 'We are what we repeatedly do. Excellence, then, is not an act, but a habit.', by: 'Will Durant' },
   { text: 'Discipline is choosing between what you want now and what you want most.', by: 'Abraham Lincoln (attr.)' },
   { text: 'The man who moves a mountain begins by carrying away small stones.', by: 'Confucius' },
@@ -24,7 +25,7 @@ const QUOTES: { text: string; by: string }[] = [
   { text: 'A year from now you may wish you had started today.', by: 'Karen Lamb' },
 ];
 
-const PROMPTS = [
+const PROMPTS_EN = [
   'What would the best version of you do first today?',
   'Where will you choose discomfort today on purpose?',
   'Who can you lift up today?',
@@ -34,10 +35,50 @@ const PROMPTS = [
   'How will you show up for your body today?',
 ];
 
-export const dailyQuote = (key: string) => QUOTES[dayOfYear(key) % QUOTES.length];
-export const dailyPrompt = (key: string) => PROMPTS[dayOfYear(key) % PROMPTS.length];
+const QUOTES_DA: { text: string; by: string }[] = [
+  { text: 'Vi er det, vi gentagne gange gør. Ekspertise er derfor ikke en handling, men en vane.', by: 'Will Durant' },
+  { text: 'Disciplin er at vælge mellem det, du vil have nu, og det, du vil have mest.', by: 'Abraham Lincoln (tilskrevet)' },
+  { text: 'Den, der flytter et bjerg, begynder med at bære små sten væk.', by: 'Konfucius' },
+  { text: 'Du stiger ikke til niveauet af dine mål. Du falder til niveauet af dine systemer.', by: 'James Clear' },
+  { text: 'Hver handling, du tager, er en stemme på den person, du ønsker at blive.', by: 'James Clear' },
+  { text: 'Det er ikke bjerget, vi besejrer, men os selv.', by: 'Edmund Hillary' },
+  { text: 'Den bedste vej ud er altid igennem.', by: 'Robert Frost' },
+  { text: 'Svære valg, let liv. Lette valg, svært liv.', by: 'Jerzy Gregorek' },
+  { text: 'Godt gjort er bedre end godt sagt.', by: 'Benjamin Franklin' },
+  { text: 'Det, du gør hver dag, betyder mere end det, du gør en gang imellem.', by: 'Gretchen Rubin' },
+  { text: 'Den, der har et hvorfor at leve for, kan klare næsten ethvert hvordan.', by: 'Friedrich Nietzsche' },
+  { text: 'Handl, som om det, du gør, gør en forskel. Det gør det.', by: 'William James' },
+  { text: 'Hemmeligheden bag at komme foran er at komme i gang.', by: 'Mark Twain (tilskrevet)' },
+  { text: 'Spild ikke mere tid på at diskutere, hvad et godt menneske skal være. Vær det.', by: 'Marcus Aurelius' },
+  { text: 'Du har magt over dit sind — ikke over ydre begivenheder. Indse det, og du vil finde styrke.', by: 'Marcus Aurelius' },
+  { text: 'Mod er ynde under pres.', by: 'Ernest Hemingway' },
+  { text: 'Små discipliner gentaget med konsekvens hver dag fører til store resultater, der opnås langsomt over tid.', by: 'John C. Maxwell' },
+  { text: 'Motivation får dig i gang, men disciplin får dig til at vokse.', by: 'John C. Maxwell' },
+  { text: 'Den eneste person, du er bestemt til at blive, er den person, du beslutter dig for at være.', by: 'Ralph Waldo Emerson (tilskrevet)' },
+  { text: 'Gør de svære opgaver først. De lette ordner sig selv.', by: 'Dale Carnegie' },
+  { text: 'Om et år ville du måske ønske, at du var startet i dag.', by: 'Karen Lamb' },
+];
 
-export const DISCIPLINE_IDEAS = [
+const PROMPTS_DA = [
+  'Hvad ville den bedste version af dig gøre først i dag?',
+  'Hvor vælger du bevidst ubehag i dag?',
+  'Hvem kan du løfte i dag?',
+  'Hvad er den ene ting, der vil gøre i dag til en sejr?',
+  'Hvilken vane takker dit fremtidige jeg dig for?',
+  'Hvad undgår du — og hvad ville der ske, hvis du tog fat på det i dag?',
+  'Hvordan viser du dig frem for din krop i dag?',
+];
+
+export const dailyQuote = (key: string) => {
+  const list = byLang({ en: QUOTES_EN, da: QUOTES_DA });
+  return list[dayOfYear(key) % list.length];
+};
+export const dailyPrompt = (key: string) => {
+  const list = byLang({ en: PROMPTS_EN, da: PROMPTS_DA });
+  return list[dayOfYear(key) % list.length];
+};
+
+const DISCIPLINE_IDEAS_EN = [
   'Cold shower for 2 minutes',
   'No phone for the first hour awake',
   'No sugar today',
@@ -55,7 +96,7 @@ export const DISCIPLINE_IDEAS = [
  * (honest self-reflection) and one "challenge" question (push past comfort).
  * Rotates daily; the two lists have co-prime lengths so pairs rarely repeat.
  */
-const MIRROR_QUESTIONS = [
+const MIRROR_QUESTIONS_EN = [
   'What excuse did you use most this week — and is it actually true?',
   'Where are you playing small right now?',
   'If someone followed you around for a day, what would they say you prioritize?',
@@ -71,7 +112,7 @@ const MIRROR_QUESTIONS = [
   'Which of your values did you honor yesterday — and which did you ignore?',
 ];
 
-const CHALLENGE_QUESTIONS = [
+const CHALLENGE_QUESTIONS_EN = [
   'What is the one uncomfortable conversation you need to have — and when will you have it?',
   'What is the hardest thing on your list today? Do it first. When will you start?',
   'What will you say no to today to protect your goals?',
@@ -85,12 +126,60 @@ const CHALLENGE_QUESTIONS = [
   'Which temptation will test you today — and what is your plan when it shows up?',
 ];
 
+const MIRROR_QUESTIONS_DA = [
+  'Hvilken undskyldning brugte du mest i denne uge — og er den faktisk sand?',
+  'Hvor spiller du for småt lige nu?',
+  'Hvis nogen fulgte dig en hel dag, hvad ville de så sige, at du prioriterer?',
+  'Hvad finder du dig i, som du ikke burde finde dig i?',
+  'Hvilken vane stjæler stille og roligt din fremtid?',
+  'Hvornår holdt du sidst et løfte til dig selv, som ingen andre ville have opdaget?',
+  'Hvad ville du gøre anderledes, hvis du vidste, at ingen ville dømme dig?',
+  'Hvilken historie om dig selv er du klar til at holde op med at fortælle?',
+  'Hvem i dit liv gør dig bedre — og bruger du nok tid sammen med dem?',
+  'Hvad bliver ved med at stå på din “en dag”-liste?',
+  'Hvor vælger du komfort frem for udvikling?',
+  'Hvad ville 80-årige dig fortælle dig om i dag?',
+  'Hvilke af dine værdier levede du efter i går — og hvilke ignorerede du?',
+];
+
+const CHALLENGE_QUESTIONS_DA = [
+  'Hvilken ubehagelig samtale skal du tage — og hvornår tager du den?',
+  'Hvad er det sværeste på din liste i dag? Gør det først. Hvornår starter du?',
+  'Hvad siger du nej til i dag for at beskytte dine mål?',
+  'Hvordan kan du give 10 % mere i din træning i dag end sidst?',
+  'Hvem kan du hjælpe eller opmuntre i dag uden at forvente noget igen?',
+  'Hvad er én ting, du kan gøre i dag, som skræmmer dig en lille smule?',
+  'Hvad ville gøre i dag til en 10/10 — og hvad holder dig tilbage?',
+  'Hvor lægger du én gentagelse, ét minut eller én side mere på, end du havde planlagt?',
+  'Hvad ville du forsøge i dag, hvis du vidste, at du ikke kunne fejle?',
+  'Hvad kan du gøre færdigt i dag, som du startede på og lod ligge?',
+  'Hvilken fristelse vil teste dig i dag — og hvad er din plan, når den dukker op?',
+];
+
 export const dailyQuestions = (key: string) => {
   const n = dayOfYear(key);
+  const mirror = byLang({ en: MIRROR_QUESTIONS_EN, da: MIRROR_QUESTIONS_DA });
+  const challenge = byLang({ en: CHALLENGE_QUESTIONS_EN, da: CHALLENGE_QUESTIONS_DA });
   return [
-    { kind: 'Mirror', text: MIRROR_QUESTIONS[n % MIRROR_QUESTIONS.length] },
-    { kind: 'Challenge', text: CHALLENGE_QUESTIONS[n % CHALLENGE_QUESTIONS.length] },
+    { kind: 'Mirror', text: mirror[n % mirror.length] },
+    { kind: 'Challenge', text: challenge[n % challenge.length] },
   ];
 };
 
-export const SOCIAL_INTENTS = ['Create & share, don’t scroll', 'Only after my top 3 is done', 'No social media today', 'Post my training', 'Reply to people, then close the app'];
+const SOCIAL_INTENTS_EN = ['Create & share, don’t scroll', 'Only after my top 3 is done', 'No social media today', 'Post my training', 'Reply to people, then close the app'];
+const SOCIAL_INTENTS_DA = ['Skab og del — scroll ikke', 'Først når mine top 3 er klaret', 'Ingen sociale medier i dag', 'Del min træning', 'Svar folk, og luk så appen'];
+export const socialIntents = () => byLang({ en: SOCIAL_INTENTS_EN, da: SOCIAL_INTENTS_DA });
+
+const DISCIPLINE_IDEAS_DA = [
+  'Kold bruser i 2 minutter',
+  'Ingen telefon den første time efter jeg vågner',
+  'Intet sukker i dag',
+  'I seng kl. 22:00',
+  'Gør den opgave, jeg har udskudt — først',
+  '30 minutters fokuseret arbejde uden notifikationer',
+  'Ingen sociale medier i dag',
+  'Gå 10.000 skridt',
+  'Sig nej til én ting, der ikke tjener mig',
+  'Ingen alkohol i dag',
+];
+export const disciplineIdeas = () => byLang({ en: DISCIPLINE_IDEAS_EN, da: DISCIPLINE_IDEAS_DA });

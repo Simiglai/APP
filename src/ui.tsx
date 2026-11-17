@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import type { ReactNode } from 'react';
 import { formatPrice } from './config';
 import { useStore } from './lib/store';
@@ -55,7 +56,7 @@ export function Scale({ value, onChange, max = 5, labels }: { value: number | nu
 export function CheckRow({ done, text, onToggle, onText, placeholder }: { done: boolean; text: string; onToggle: () => void; onText: (v: string) => void; placeholder?: string }) {
   return (
     <div className={`checkrow${done ? ' is-done' : ''}`}>
-      <button type="button" className="checkbox" aria-pressed={done} aria-label={done ? 'Mark not done' : 'Mark done'} onClick={onToggle}>
+      <button type="button" className="checkbox" aria-pressed={done} aria-label={done ? t('Mark not done') : t('Mark done')} onClick={onToggle}>
         {done ? '✓' : ''}
       </button>
       <input className="input input--bare" value={text} placeholder={placeholder} onChange={(e) => onText(e.target.value)} />
@@ -87,10 +88,10 @@ export function Locked({ feature, title, children, onUpgrade }: { feature: Featu
   const { state } = useStore();
   return (
     <section className="card card--accent locked">
-      <span className="tag tag--plan">{plan.name} · {formatPrice(plan.price[state.profile.currency], state.profile.currency)}/mo</span>
+      <span className="tag tag--plan">{plan.name} · {formatPrice(plan.price[state.profile.currency], state.profile.currency)}/{t('mo')}</span>
       <h2 className="locked__title">{title}</h2>
       {children && <div className="locked__body">{children}</div>}
-      <button className="btn btn--invert" onClick={onUpgrade}>Unlock with {plan.name}</button>
+      <button className="btn btn--invert" onClick={onUpgrade}>{t('Unlock with {plan}', { plan: plan.name })}</button>
     </section>
   );
 }

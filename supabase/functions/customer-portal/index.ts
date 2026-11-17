@@ -23,13 +23,13 @@ Deno.serve(async (req) => {
     const { data: profile } = await admin.from('profiles').select('stripe_customer_id').eq('id', user.id).single();
     if (!profile?.stripe_customer_id) return json({ error: 'No subscription found for this account.' }, 404);
 
-    const { returnUrl } = await req.json().catch(() => ({}));
+    const { returnUrl, locale } = await req.json().catch(() => ({}));
     const back = typeof returnUrl === 'string' && /^https?:\/\//.test(returnUrl) ? returnUrl : Deno.env.get('SITE_URL') ?? 'http://localhost:5173';
 
     const res = await fetch('https://api.stripe.com/v1/billing_portal/sessions', {
       method: 'POST',
       headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ customer: profile.stripe_customer_id, return_url: `${back}?checkout=portal` }),
+      body: new URLSearchParams({ customer: profile.stripe_customer_id, return_url: `${back}?checkout=portal`, locale: locale === 'da' ? 'da' : 'auto' }),
     });
     const data = await res.json();
     if (!res.ok) return json({ error: data?.error?.message ?? 'Could not open billing portal.' }, 500);

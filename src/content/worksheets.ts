@@ -1,3 +1,5 @@
+import { byLang } from '../i18n';
+
 /**
  * Mental worksheets (Elite). Each worksheet is a list of fields the client fills in.
  * Add or edit worksheets here — the app renders them automatically.
@@ -9,7 +11,7 @@ export type WorksheetField =
 
 export type Worksheet = { id: string; title: string; minutes: number; intro: string; fields: WorksheetField[] };
 
-export const WORKSHEETS: Worksheet[] = [
+const WORKSHEETS_EN: Worksheet[] = [
   {
     id: 'fear-setting',
     title: 'Fear setting',
@@ -99,3 +101,97 @@ export const WORKSHEETS: Worksheet[] = [
     ],
   },
 ];
+
+const WORKSHEETS_DA: Worksheet[] = [
+  {
+    id: 'fear-setting',
+    title: 'Frygt-øvelsen',
+    minutes: 20,
+    intro: 'Definér din frygt i stedet for dine mål. Det, vi frygter mest at gøre, er som regel det, vi har mest brug for at gøre.',
+    fields: [
+      { key: 'what', type: 'long', label: 'Hvad er jeg bange for at gøre eller ændre?', placeholder: 'Starte min egen virksomhed, tage den svære samtale, melde mig til løbet…' },
+      { key: 'h1', type: 'heading', label: 'Det værste scenarie', hint: 'Vær konkret. Frygt lever af det uklare.' },
+      { key: 'define', type: 'long', label: 'Definér — det værste, der kunne ske' },
+      { key: 'prevent', type: 'long', label: 'Forebyg — hvad kunne jeg gøre for at forhindre hver af dem?' },
+      { key: 'repair', type: 'long', label: 'Reparér — hvis det skete, hvordan ville jeg så rette op på det, eller hvem kunne hjælpe mig?' },
+      { key: 'h2', type: 'heading', label: 'Gevinsten' },
+      { key: 'benefits', type: 'long', label: 'Hvad kunne jeg vinde ved et forsøg eller en delvis succes?' },
+      { key: 'h3', type: 'heading', label: 'Prisen for at gøre ingenting' },
+      { key: 'cost6', type: 'long', label: 'Hvis jeg undgår det — hvordan ser mit liv så ud om 6 måneder?' },
+      { key: 'cost1', type: 'long', label: '…om 1 år?' },
+      { key: 'cost3', type: 'long', label: '…om 3 år?' },
+      { key: 'first', type: 'text', label: 'Det første skridt, jeg tager inden for 48 timer' },
+    ],
+  },
+  {
+    id: 'limiting-beliefs',
+    title: 'Bryd en begrænsende overbevisning',
+    minutes: 15,
+    intro: 'Dine overbevisninger sætter loftet for, hvad du tør forsøge. Find én, og skriv den om.',
+    fields: [
+      { key: 'belief', type: 'long', label: 'En overbevisning, der holder mig tilbage', placeholder: 'Jeg er ikke typen, der…' },
+      { key: 'origin', type: 'long', label: 'Hvor kommer denne overbevisning fra?' },
+      { key: 'cost', type: 'long', label: 'Hvad har den kostet mig indtil nu?' },
+      { key: 'evidence', type: 'long', label: 'Beviser på, at den IKKE er sand' },
+      { key: 'newBelief', type: 'long', label: 'Min nye, styrkende overbevisning', placeholder: 'Jeg er en person, der…' },
+      { key: 'proof', type: 'text', label: 'Én handling i denne uge, der beviser den nye overbevisning' },
+    ],
+  },
+  {
+    id: 'future-self',
+    title: 'Brev fra dit fremtidige jeg',
+    minutes: 20,
+    intro: 'Skriv et brev fra dig selv om 3 år — efter at du er blevet den person, du arbejder på at blive.',
+    fields: [
+      { key: 'life', type: 'long', label: 'Beskriv dit liv om 3 år — helbred, arbejde, relationer, hvordan du har det' },
+      { key: 'decisions', type: 'long', label: 'Hvilke beslutninger gjorde den største forskel?' },
+      { key: 'quit', type: 'long', label: 'Hvad måtte du holde op med?' },
+      { key: 'advice', type: 'long', label: 'Hvilket råd giver du dit nuværende jeg i dag?' },
+    ],
+  },
+  {
+    id: 'wheel-of-life',
+    title: 'Livshjulet',
+    minutes: 10,
+    intro: 'Giv hvert område af dit liv en karakter fra 1 til 10. Balance handler ikke om perfektion — men om bevidsthed.',
+    fields: [
+      { key: 'health', type: 'scale', label: 'Helbred og fysik', max: 10 },
+      { key: 'mind', type: 'scale', label: 'Mindset og mental sundhed', max: 10 },
+      { key: 'career', type: 'scale', label: 'Karriere og forretning', max: 10 },
+      { key: 'finance', type: 'scale', label: 'Økonomi', max: 10 },
+      { key: 'relationships', type: 'scale', label: 'Partner / kærlighed', max: 10 },
+      { key: 'family', type: 'scale', label: 'Familie og venner', max: 10 },
+      { key: 'fun', type: 'scale', label: 'Sjov og eventyr', max: 10 },
+      { key: 'purpose', type: 'scale', label: 'Formål og bidrag', max: 10 },
+      { key: 'focus', type: 'long', label: 'Hvilket ÉT område ville løfte alle de andre, hvis det blev bedre? Hvad gør jeg?' },
+    ],
+  },
+  {
+    id: 'pressure-plan',
+    title: 'Plan under pres',
+    minutes: 15,
+    intro: 'Vindere hæver sig ikke til lejligheden — de falder tilbage på deres forberedelse. Planlæg din reaktion, før presset rammer.',
+    fields: [
+      { key: 'situations', type: 'long', label: 'Situationer, hvor jeg typisk mister kontrollen eller giver op' },
+      { key: 'signals', type: 'long', label: 'Tidlige advarselstegn (tanker, krop, adfærd)' },
+      { key: 'reset', type: 'long', label: 'Min nulstillingsrutine (vejrtrækning, stikord, handling)', placeholder: '3 dybe indåndinger, sig “Næste”, fokusér på den næste lille handling' },
+      { key: 'cue', type: 'text', label: 'Mit stikord' },
+      { key: 'after', type: 'long', label: 'Sådan vil jeg tale til mig selv efter et nederlag' },
+    ],
+  },
+  {
+    id: 'non-negotiables',
+    title: 'Værdier og ufravigelige principper',
+    minutes: 10,
+    intro: 'Beslut det én gang, så du ikke skal beslutte det hver dag.',
+    fields: [
+      { key: 'values', type: 'long', label: 'Mine 5 vigtigste værdier i prioriteret rækkefølge' },
+      { key: 'daily', type: 'long', label: 'Mine daglige ufravigelige', placeholder: 'Træne, 8 timer i sengen, 30 min med mine børn, ingen telefon ved middagsbordet' },
+      { key: 'never', type: 'long', label: 'Ting, jeg ikke længere gør' },
+      { key: 'boundary', type: 'text', label: 'Én grænse, jeg holder fast i denne måned' },
+    ],
+  },
+];
+
+/** Worksheets in the current language (ids are the same in every language). */
+export const getWorksheets = () => byLang({ en: WORKSHEETS_EN, da: WORKSHEETS_DA });

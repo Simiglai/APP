@@ -1,3 +1,4 @@
+import { locale } from '../i18n';
 export const toKey = (d: Date) => {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -18,15 +19,21 @@ export const weekdayIndex = (key: string) => {
   return (new Date(y, m - 1, d).getDay() + 6) % 7;
 };
 
-export const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+/** Weekday names Monday..Sunday in the current language, capitalised (Danish names are lower-case by default). */
+export const weekdays = () =>
+  Array.from({ length: 7 }, (_, i) => {
+    const s = new Date(2024, 0, 1 + i).toLocaleDateString(locale(), { weekday: 'long' }); // 1 Jan 2024 was a Monday
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  });
 
 export const prettyDate = (key: string) => {
   const [y, m, d] = key.split('-').map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString(undefined, {
+  const s = new Date(y, m - 1, d).toLocaleDateString(locale(), {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
   });
+  return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
 export const dayOfYear = (key: string) => {
@@ -37,3 +44,9 @@ export const dayOfYear = (key: string) => {
 
 /** Monday of the week containing `key`. */
 export const weekStart = (key: string) => addDays(key, -weekdayIndex(key));
+
+/** e.g. "16 November" / "16. november" */
+export const shortDate = (key: string) => {
+  const [y, m, d] = key.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString(locale(), { day: 'numeric', month: 'long' });
+};

@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
     const { data: { user } } = await userClient.auth.getUser();
     if (!user) return json({ error: 'Please log in again.' }, 401);
 
-    const { tier, currency, returnUrl } = await req.json();
+    const { tier, currency, returnUrl, locale } = await req.json();
     if (!TIERS.includes(tier)) return json({ error: 'Unknown plan.' }, 400);
     const cur = currency === 'usd' ? 'usd' : 'dkk';
     const back = typeof returnUrl === 'string' && /^https?:\/\//.test(returnUrl) ? returnUrl : Deno.env.get('SITE_URL') ?? 'http://localhost:5173';
@@ -84,6 +84,7 @@ Deno.serve(async (req) => {
       'line_items[0][quantity]': '1',
       currency: cur,
       allow_promotion_codes: 'true',
+      locale: locale === 'da' ? 'da' : 'auto',
       'subscription_data[metadata][user_id]': user.id,
       'subscription_data[metadata][tier]': tier,
       success_url: `${back}?checkout=success`,

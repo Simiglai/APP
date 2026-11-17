@@ -1,3 +1,4 @@
+import { t as tr } from './i18n';
 import { useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { StoreProvider, useStore } from './lib/store';
@@ -59,7 +60,7 @@ function Shell() {
         {TABS.map((t) => (
           <button key={t.id} className={activeTab === t.id ? 'is-on' : ''} onClick={() => go(t.id)}>
             <t.Icon />
-            {t.label}
+            {tr(t.label)}
           </button>
         ))}
       </nav>

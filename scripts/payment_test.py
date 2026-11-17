@@ -35,14 +35,15 @@ try:
     token, uid = r['access_token'], r['user']['id']
     print('1. test client signed up', profile(uid))
 
-    co = fn('create-checkout', token, {'tier': 'perform', 'currency': 'dkk', 'returnUrl': 'https://ps-daily.netlify.app/'})
+    sql(f"update profiles set approved_tiers='{{perform}}' where id='{uid}'")  # coach approved after the call
+    co = fn('create-checkout', token, {'tier': 'perform', 'currency': 'dkk', 'locale': 'da', 'returnUrl': 'https://app.patricksimiglai.com/'})
     url = co.get('url', '')
     print('2. checkout url:', url[:45] + '…' if url else co)
     sess_id = url.split('/pay/')[1].split('#')[0] if '/pay/' in url else None
     if sess_id:
         s = stripe(f'checkout/sessions/{sess_id}?expand[]=line_items')
         li = s['line_items']['data'][0]
-        print(f"   session: mode={s['mode']} currency={s['currency']} amount={s['amount_total']/100:.0f} {s['currency'].upper()} price={li['price']['lookup_key']} success_url={s['success_url']}")
+        print(f"   session: locale={s.get('locale')} mode={s['mode']} currency={s['currency']} amount={s['amount_total']/100:.0f} {s['currency'].upper()} price={li['price']['lookup_key']} success_url={s['success_url']}")
 
     customer = sql(f"select stripe_customer_id from profiles where id='{uid}'")[0]['stripe_customer_id']
     # pay with Stripe's test Visa (what the client would type on the checkout page)
@@ -56,8 +57,8 @@ try:
     po = fn('customer-portal', token, {'returnUrl': 'https://ps-daily.netlify.app/'})
     print('4. billing portal url:', (po.get('url') or po)[:50])
 
-    co2 = fn('create-checkout', token, {'tier': 'elite', 'currency': 'usd'})
-    print('5. second checkout while active is refused:', co2.get('error'))
+    co2 = fn('create-checkout', token, {'tier': 'perform', 'currency': 'usd'})
+    print('5. same plan again is refused:', co2.get('error'))
 
     if 'id' in sub: stripe(f"subscriptions/{sub['id']}", method='DELETE')
     print('6. subscription cancelled')

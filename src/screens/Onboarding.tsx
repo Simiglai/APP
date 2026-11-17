@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useState } from 'react';
 import { useStore } from '../lib/store';
 import { BrandLogo, TextField } from '../ui';
@@ -11,41 +12,41 @@ export default function Onboarding() {
 
   const steps = [
     {
-      title: 'Welcome. Let’s build the best version of you.',
+      title: t("Welcome. Let’s build the best version of you."),
       body: (
         <>
-          <p className="muted">This takes 2 minutes. Your answers shape your daily check-ins.</p>
-          <TextField label="What should we call you?" value={p.name} onChange={(name) => updateProfile({ name })} placeholder="Your first name" />
+          <p className="muted">{t("This takes 2 minutes. Your answers shape your daily check-ins.")}</p>
+          <TextField label={t("What should we call you?")} value={p.name} onChange={(name) => updateProfile({ name })} placeholder={t("Your first name")} />
         </>
       ),
       ok: p.name.trim().length > 0,
     },
     {
-      title: 'What’s your identity?',
+      title: t("What’s your identity?"),
       body: (
         <>
-          <p className="muted">Lasting change starts with who you believe you are. Write it in the present tense.</p>
-          <TextField multiline label="I am…" value={p.identity} onChange={(identity) => updateProfile({ identity })} placeholder="I am an athlete who never misses a training session. I am a calm, present father." />
+          <p className="muted">{t("Lasting change starts with who you believe you are. Write it in the present tense.")}</p>
+          <TextField multiline label={t("I am…")} value={p.identity} onChange={(identity) => updateProfile({ identity })} placeholder={t("I am an athlete who never misses a training session. I am a calm, present father.")} />
         </>
       ),
       ok: p.identity.trim().length > 0,
     },
     {
-      title: 'What can you become?',
+      title: t("What can you become?"),
       body: (
         <>
-          <p className="muted">Picture yourself 3 years from now, fully living your potential.</p>
-          <TextField multiline label="I am becoming…" value={p.becoming} onChange={(becoming) => updateProfile({ becoming })} placeholder="Strong, lean and energetic. Running my own business. Known for keeping my word." />
-          <TextField multiline label="My purpose / mission" value={p.purpose} onChange={(purpose) => updateProfile({ purpose })} placeholder="To inspire people around me to take ownership of their health and life." />
+          <p className="muted">{t("Picture yourself 3 years from now, fully living your potential.")}</p>
+          <TextField multiline label={t("I am becoming…")} value={p.becoming} onChange={(becoming) => updateProfile({ becoming })} placeholder={t("Strong, lean and energetic. Running my own business. Known for keeping my word.")} />
+          <TextField multiline label={t("My purpose / mission")} value={p.purpose} onChange={(purpose) => updateProfile({ purpose })} placeholder={t("To inspire people around me to take ownership of their health and life.")} />
         </>
       ),
       ok: p.becoming.trim().length > 0,
     },
     {
-      title: 'Your core values',
+      title: t("Your core values"),
       body: (
         <>
-          <p className="muted">Pick up to 3. These are your compass on hard days.</p>
+          <p className="muted">{t("Pick up to 3. These are your compass on hard days.")}</p>
           <div className="chips">
             {VALUE_OPTIONS.map((v) => {
               const on = p.values.includes(v);
@@ -56,7 +57,7 @@ export default function Onboarding() {
                   className={`chip${on ? ' is-on' : ''}`}
                   onClick={() => updateProfile({ values: on ? p.values.filter((x) => x !== v) : p.values.length < 3 ? [...p.values, v] : p.values })}
                 >
-                  {v}
+                  {t(v)}
                 </button>
               );
             })}
@@ -83,11 +84,11 @@ export default function Onboarding() {
       <div className="onboard__actions">
         {step > 0 && (
           <button className="btn btn--ghost" onClick={() => setStep(step - 1)}>
-            Back
+            {t("Back")}
           </button>
         )}
         <button className="btn" disabled={!s.ok} onClick={() => (last ? updateProfile({ onboarded: true }) : setStep(step + 1))}>
-          {last ? 'Start my first day' : 'Continue'}
+          {last ? t("Start my first day") : t("Continue")}
         </button>
       </div>
     </div>

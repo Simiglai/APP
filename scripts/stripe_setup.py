@@ -18,13 +18,13 @@ def post(path, data, idem):
     return r
 
 PLANS = [
-    ('accountable', 'PS Daily — Accountable', 'Daily check-in & planner, challenge questions, identity work, coach chat, weekly review & goals.', 34900, 5000),
-    ('perform', 'PS Daily — Perform', 'Everything in Accountable + personal training programs and TrainingPeaks connection.', 199900, 30000),
-    ('elite', 'PS Daily — Elite', 'Everything in Perform + mental worksheets and events.', 349900, 50000),
+    ('accountable', 'Patrick Simiglai — Accountable', 'Daily check-in & planner, challenge questions, identity work, coach chat, weekly review & goals.', 34900, 5000),
+    ('perform', 'Patrick Simiglai — Perform', 'Everything in Accountable + personal training programs and TrainingPeaks connection.', 199900, 30000),
+    ('elite', 'Patrick Simiglai — Elite', 'Everything in Perform + mental worksheets and events.', 349900, 50000),
 ]
 out = {}
 for tier, name, desc, dkk, usd in PLANS:
-    prod = post('products', {'name': name, 'description': desc, 'metadata[tier]': tier}, f'psdaily-prod-{tier}-v1')
+    prod = post('products', {'name': name, 'description': desc, 'statement_descriptor': 'PATRICK SIMIGLAI', 'metadata[tier]': tier}, f'psdaily-prod-{tier}-v1')
     price = post('prices', {
         'product': prod['id'],
         'currency': 'dkk',

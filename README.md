@@ -1,4 +1,4 @@
-# PS Daily — Patrick Simiglai
+# Patrick Simiglai — coaching app
 
 A daily planner + accountability app for Patrick Simiglai's coaching clients — check in every morning, answer challenge questions, plan training, food and socials, act like the person they're becoming, and report to their coach.
 
@@ -69,6 +69,10 @@ Live at **https://app.patricksimiglai.com** (also https://ps-daily.netlify.app; 
 3. Supabase sends auth emails via Resend SMTP (noreply@patricksimiglai.com). Remaining: Resend DNS records in Simply → domain verified → turn email confirmation on (`mailer_autoconfirm = false`).
 4. ✓ Custom domain app.patricksimiglai.com live with HTTPS.
 5. Create Patrick's own account and set `role = 'coach'`.
+
+## Languages
+
+Danish and English. Danish phones get Danish automatically; clients can switch under **Me → Language**. All UI text goes through `t()` (`src/i18n.tsx`) with the Danish dictionary in `src/i18n.da.ts` (keys are the English texts; missing keys fall back to English). Content has Danish versions too: quotes, daily questions, discipline ideas, social rules (`src/lib/motivation.ts`), worksheets (`src/content/worksheets.ts`), training templates and the default week. Language and currency (DKK for Danish) are stored on the profile at sign-up; Stripe Checkout and the billing portal open in Danish for Danish clients.
 
 ## Brand
 

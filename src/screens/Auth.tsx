@@ -1,6 +1,7 @@
+import { getLang, t } from '../i18n';
 import { useState, type FormEvent } from 'react';
 import { supabase } from '../lib/supabase';
-import { COACH_NAME } from '../config';
+import { COACH_NAME, defaultCurrency } from '../config';
 import { BrandLogo } from '../ui';
 
 export default function Auth() {
@@ -18,7 +19,7 @@ export default function Auth() {
     setError('');
     const { error } =
       mode === 'signup'
-        ? await supabase.auth.signUp({ email, password, options: { data: { name: name.trim() } } })
+        ? await supabase.auth.signUp({ email, password, options: { data: { name: name.trim(), language: getLang(), currency: defaultCurrency() } } })
         : mode === 'reset'
           ? await supabase.auth.resetPasswordForEmail(email, { redirectTo: location.origin })
           : await supabase.auth.signInWithPassword({ email, password });
@@ -30,28 +31,28 @@ export default function Auth() {
   return (
     <div className="onboard auth">
       <BrandLogo variant="logo" className="onboard__logo" />
-      <h1>{mode === 'signup' ? 'Create your account' : mode === 'reset' ? 'Reset your password' : 'Welcome back'}</h1>
+      <h1>{mode === 'signup' ? t('Create your account') : mode === 'reset' ? t('Reset your password') : t('Welcome back')}</h1>
       <p className="muted">
         {mode === 'signup'
-          ? `Daily planning, challenge questions and accountability with ${COACH_NAME}.`
+          ? t('Daily planning, challenge questions and accountability with {coach}.', { coach: COACH_NAME })
           : mode === 'reset'
-            ? 'Enter your email and we’ll send you a link to choose a new password.'
-            : 'Log in to continue your streak.'}
+            ? t('Enter your email and we’ll send you a link to choose a new password.')
+            : t('Log in to continue your streak.')}
       </p>
       <form className="stack" onSubmit={submit}>
         {mode === 'signup' && (
           <label className="field">
-            <span className="field__label">First name</span>
+            <span className="field__label">{t("First name")}</span>
             <input className="input" value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" required />
           </label>
         )}
         <label className="field">
-          <span className="field__label">Email</span>
+          <span className="field__label">{t("Email")}</span>
           <input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
         </label>
         {mode !== 'reset' && (
         <label className="field">
-          <span className="field__label">Password</span>
+          <span className="field__label">{t("Password")}</span>
           <input
             className="input"
             type="password"
@@ -61,29 +62,29 @@ export default function Auth() {
             minLength={8}
             required
           />
-          {mode === 'signup' && <span className="muted small">At least 8 characters.</span>}
+          {mode === 'signup' && <span className="muted small">{t("At least 8 characters.")}</span>}
         </label>
         )}
-        {sent && <p className="done-banner">✓ Check your email for the reset link.</p>}
+        {sent && <p className="done-banner">{t("✓ Check your email for the reset link.")}</p>}
         {error && <p className="error">{error}</p>}
         <button className="btn btn--big" disabled={busy}>
-          {busy ? '…' : mode === 'signup' ? 'Create account' : mode === 'reset' ? 'Send reset link' : 'Log in'}
+          {busy ? '…' : mode === 'signup' ? t('Create account') : mode === 'reset' ? t('Send reset link') : t('Log in')}
         </button>
       </form>
       <button className="btn btn--link" onClick={() => { setMode(mode === 'signup' ? 'signin' : 'signup'); setError(''); setSent(false); }}>
-        {mode === 'signup' ? 'Already have an account? Log in' : 'New here? Create an account'}
+        {mode === 'signup' ? t('Already have an account? Log in') : t('New here? Create an account')}
       </button>
       {mode === 'signin' && (
-        <button className="btn btn--link" onClick={() => { setMode('reset'); setError(''); }}>Forgot your password?</button>
+        <button className="btn btn--link" onClick={() => { setMode('reset'); setError(''); }}>{t("Forgot your password?")}</button>
       )}
     </div>
   );
 }
 
 const friendly = (msg: string) => {
-  if (/invalid login/i.test(msg)) return 'Wrong email or password.';
-  if (/already registered/i.test(msg)) return 'That email already has an account — log in instead.';
-  if (/password/i.test(msg) && /characters/i.test(msg)) return 'Password must be at least 8 characters.';
+  if (/invalid login/i.test(msg)) return t("Wrong email or password.");
+  if (/already registered/i.test(msg)) return t("That email already has an account — log in instead.");
+  if (/password/i.test(msg) && /characters/i.test(msg)) return t("Password must be at least 8 characters.");
   return msg;
 };
 
@@ -103,15 +104,15 @@ export function NewPassword({ onDone }: { onDone: () => void }) {
   return (
     <div className="onboard auth">
       <BrandLogo variant="logo" className="onboard__logo" />
-      <h1>Choose a new password</h1>
+      <h1>{t("Choose a new password")}</h1>
       <form className="stack" onSubmit={submit}>
         <label className="field">
-          <span className="field__label">New password</span>
+          <span className="field__label">{t("New password")}</span>
           <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" minLength={8} required />
-          <span className="muted small">At least 8 characters.</span>
+          <span className="muted small">{t("At least 8 characters.")}</span>
         </label>
         {error && <p className="error">{error}</p>}
-        <button className="btn btn--big" disabled={busy}>{busy ? '…' : 'Save new password'}</button>
+        <button className="btn btn--big" disabled={busy}>{busy ? '…' : t('Save new password')}</button>
       </form>
     </div>
   );

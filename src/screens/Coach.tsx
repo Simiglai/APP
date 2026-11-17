@@ -1,9 +1,10 @@
+import { locale, t } from '../i18n';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { daySummary, emptyDay, useStore } from '../lib/store';
 import { addDays, prettyDate, todayKey } from '../lib/dates';
 import { PLANS, planById, type Tier } from '../lib/plans';
-import { WORKSHEETS } from '../content/worksheets';
+import { getWorksheets } from '../content/worksheets';
 import type { DayEntry, WeekReview } from '../lib/types';
 import { BrandLogo, Card, TextField } from '../ui';
 
@@ -33,11 +34,11 @@ const daysSince = (date: string | null) => (date ? Math.round((Date.parse(todayK
 const flags = (c: ClientRow) => {
   const f: string[] = [];
   const since = daysSince(c.last_checkin);
-  if (since === null) f.push('Never checked in');
-  else if (since >= 2) f.push(`No check-in for ${since} days`);
-  if (c.mood_7d !== null && c.mood_7d <= 2.5) f.push('Low mood');
-  if (c.energy_7d !== null && c.energy_7d <= 2.5) f.push('Low energy');
-  if (c.plan_status === 'past_due') f.push('Payment failed');
+  if (since === null) f.push(t('Never checked in'));
+  else if (since >= 2) f.push(t('No check-in for {n} days', { n: since }));
+  if (c.mood_7d !== null && c.mood_7d <= 2.5) f.push(t('Low mood'));
+  if (c.energy_7d !== null && c.energy_7d <= 2.5) f.push(t('Low energy'));
+  if (c.plan_status === 'past_due') f.push(t('Payment failed'));
   return f;
 };
 
@@ -75,17 +76,17 @@ export default function Coach() {
         <header className="hero">
           <div className="brandbar">
             <BrandLogo />
-            <button className="btn btn--link" onClick={() => supabase.auth.signOut()}>Log out</button>
+            <button className="btn btn--link" onClick={() => supabase.auth.signOut()}>{t("Log out")}</button>
           </div>
-          <h1>Coach dashboard</h1>
+          <h1>{t("Coach dashboard")}</h1>
           <div className="hero__stats">
-            <div><strong>{active.length}</strong><span>active clients</span></div>
-            <div><strong>{needAttention.length}</strong><span>need attention</span></div>
-            <div><strong>{sorted.reduce((n, c) => n + c.unread, 0)}</strong><span>unread</span></div>
+            <div><strong>{active.length}</strong><span>{t("active clients")}</span></div>
+            <div><strong>{needAttention.length}</strong><span>{t("need attention")}</span></div>
+            <div><strong>{sorted.reduce((n, c) => n + c.unread, 0)}</strong><span>{t("unread")}</span></div>
           </div>
           <div className="segmented">
-            <button className={tab === 'clients' ? 'is-on' : ''} onClick={() => setTab('clients')}>Clients</button>
-            <button className={tab === 'events' ? 'is-on' : ''} onClick={() => setTab('events')}>Events</button>
+            <button className={tab === 'clients' ? 'is-on' : ''} onClick={() => setTab('clients')}>{t('Clients')}</button>
+            <button className={tab === 'events' ? 'is-on' : ''} onClick={() => setTab('events')}>{t('Events')}</button>
           </div>
         </header>
 
@@ -94,7 +95,7 @@ export default function Coach() {
         ) : clients === null ? (
           <div className="spinner" />
         ) : sorted.length === 0 ? (
-          <p className="empty">No clients yet. When clients sign up in the app they appear here.</p>
+          <p className="empty">{t("No clients yet. When clients sign up in the app they appear here.")}</p>
         ) : (
           <Card>
             <div className="list">
@@ -104,14 +105,14 @@ export default function Coach() {
                   <button key={c.id} className="list__item client-row" onClick={() => setOpen(c)}>
                     <span>
                       <strong>
-                        {c.name || 'Unnamed'} {c.unread > 0 && <span className="badge">{c.unread}</span>}
+                        {c.name || t('Unnamed')} {c.unread > 0 && <span className="badge">{c.unread}</span>}
                       </strong>
                       <small className="muted">
-                        {planById(c.plan).name} · {c.plan_status === 'active' || c.plan_status === 'trialing' ? `${c.checkins_7d}/7 check-ins` : 'not subscribed'}
-                        {c.mood_7d !== null && ` · mood ${c.mood_7d}`}
-                        {c.rating_7d !== null && ` · day ${c.rating_7d}/10`}
+                        {planById(c.plan).name} · {c.plan_status === 'active' || c.plan_status === 'trialing' ? t('{n}/7 check-ins', { n: c.checkins_7d }) : t('not subscribed')}
+                        {c.mood_7d !== null && ` · ${t('mood')} ${c.mood_7d}`}
+                        {c.rating_7d !== null && ` · ${t('day')} ${c.rating_7d}/10`}
                       </small>
-                      {pendingRequest(c) && <small className="request">📞 Call requested for {planById(pendingRequest(c)!).name} — approve after the call</small>}
+                      {pendingRequest(c) && <small className="request">{t('📞 Call requested for {plan} — approve after the call', { plan: planById(pendingRequest(c)!).name })}</small>}
                       {f.length > 0 && <small className="flag">⚠ {f.join(' · ')}</small>}
                     </span>
                     <span aria-hidden>›</span>
@@ -166,7 +167,7 @@ function ClientDetail({ client, onBack }: { client: ClientRow; onBack: () => voi
       await supabase.from('messages').insert({
         client_id: client.id,
         sender_id: userId,
-        body: `✅ Great talking to you! You're approved for ${planById(tier).name}. Open Me → Membership in the app to get started.`,
+        body: t('✅ Great talking to you! You’re approved for {plan}. Open Me → Membership in the app to get started.', { plan: planById(tier).name }),
       });
     }
   };
@@ -177,27 +178,27 @@ function ClientDetail({ client, onBack }: { client: ClientRow; onBack: () => voi
   return (
     <div className="stack">
       <header className="page-head">
-        <button className="btn btn--link" style={{ alignSelf: 'flex-start' }} onClick={onBack}>‹ All clients</button>
-        <h1>{client.name || 'Unnamed client'}</h1>
+        <button className="btn btn--link" style={{ alignSelf: 'flex-start' }} onClick={onBack}>{t("‹ All clients")}</button>
+        <h1>{client.name || t('Unnamed client')}</h1>
         <p className="muted">
-          {planById(profile?.plan ?? client.plan).name} · {profile?.plan_status ?? client.plan_status} · client since {client.created_at.slice(0, 10)}
+          {planById(profile?.plan ?? client.plan).name} · {t(profile?.plan_status ?? client.plan_status)} · {t('client since')} {client.created_at.slice(0, 10)}
         </p>
       </header>
 
-      <Card title="Identity">
+      <Card title={t("Identity")}>
         {profile ? (
           <>
-            <p><strong>I am:</strong> {profile.identity || '—'}</p>
-            <p><strong>Becoming:</strong> {profile.becoming || '—'}</p>
-            <p><strong>Purpose:</strong> {profile.purpose || '—'}</p>
-            <div className="chips">{profile.values.map((v) => <span key={v} className="chip is-on">{v}</span>)}</div>
+            <p><strong>{t('I am:')}</strong> {profile.identity || '—'}</p>
+            <p><strong>{t('Becoming:')}</strong> {profile.becoming || '—'}</p>
+            <p><strong>{t('Purpose:')}</strong> {profile.purpose || '—'}</p>
+            <div className="chips">{profile.values.map((v) => <span key={v} className="chip is-on">{t(v)}</span>)}</div>
           </>
         ) : (
           <div className="spinner" />
         )}
       </Card>
 
-      <Card title="Last 14 days" hint="Tap a day to see the full check-in.">
+      <Card title={t("Last 14 days")} hint={t("Tap a day to see the full check-in.")}>
         <div className="daygrid">
           {last14.map((date) => {
             const d = byDate[date];
@@ -210,19 +211,19 @@ function ClientDetail({ client, onBack }: { client: ClientRow; onBack: () => voi
             );
           })}
         </div>
-        <p className="muted small">● planned + reviewed · ◐ planned only · ○ nothing</p>
+        <p className="muted small">{t("● planned + reviewed · ◐ planned only · ○ nothing")}</p>
         {openDay && (
           <div className="day-detail">
             <h2>{prettyDate(openDay)}</h2>
-            {byDate[openDay] ? <pre>{daySummary(client.name, byDate[openDay])}</pre> : <p className="muted">No check-in this day.</p>}
-            {byDate[openDay]?.wins && <p><strong>Wins:</strong> {byDate[openDay].wins}</p>}
-            {byDate[openDay]?.lesson && <p><strong>Lesson:</strong> {byDate[openDay].lesson}</p>}
+            {byDate[openDay] ? <pre>{daySummary(client.name, byDate[openDay])}</pre> : <p className="muted">{t("No check-in this day.")}</p>}
+            {byDate[openDay]?.wins && <p><strong>{t('Wins:')}</strong> {byDate[openDay].wins}</p>}
+            {byDate[openDay]?.lesson && <p><strong>{t('Lesson:')}</strong> {byDate[openDay].lesson}</p>}
           </div>
         )}
       </Card>
 
       {weeks.length > 0 && (
-        <Card title="Weekly reviews">
+        <Card title={t("Weekly reviews")}>
           {weeks.map((w) => (
             <div key={w.weekStart} className="review">
               <strong>Week of {w.weekStart} · {w.score ?? '–'}/10</strong>
@@ -235,9 +236,9 @@ function ClientDetail({ client, onBack }: { client: ClientRow; onBack: () => voi
       )}
 
       {sheets.length > 0 && (
-        <Card title="Shared worksheets">
+        <Card title={t("Shared worksheets")}>
           {sheets.map((s) => {
-            const def = WORKSHEETS.find((w) => w.id === s.worksheet_id);
+            const def = getWorksheets().find((w) => w.id === s.worksheet_id);
             return (
               <details key={s.worksheet_id} className="review">
                 <summary><strong>{def?.title ?? s.worksheet_id}</strong> <small className="muted">· {s.shared_at.slice(0, 10)}</small></summary>
@@ -254,27 +255,27 @@ function ClientDetail({ client, onBack }: { client: ClientRow; onBack: () => voi
 
       <Thread clientId={client.id} coachId={userId} name={client.name} />
 
-      <Card title="Approve Perform / Elite" hint="After the call, approve the plan(s) this client may join. They get a message and can then pay in the app.">
+      <Card title={t("Approve Perform / Elite")} hint={t("After the call, approve the plan(s) this client may join. They get a message and can then pay in the app.")}>
         {profile?.requested_tier && !profile.approved_tiers.includes(profile.requested_tier) && (
-          <p className="call-note">📞 Requested a call for {planById(profile.requested_tier).name}.</p>
+          <p className="call-note">{t('📞 Requested a call for {plan}.', { plan: planById(profile.requested_tier).name })}</p>
         )}
         <div className="chips">
-          {(['perform', 'elite'] as Tier[]).map((t) => (
-            <button key={t} className={`chip${profile?.approved_tiers.includes(t) ? ' is-on' : ''}`} onClick={() => toggleApproval(t)}>
-              {profile?.approved_tiers.includes(t) ? '✓ ' : ''}{planById(t).name}
+          {(['perform', 'elite'] as Tier[]).map((tier) => (
+            <button key={tier} className={`chip${profile?.approved_tiers.includes(tier) ? ' is-on' : ''}`} onClick={() => toggleApproval(tier)}>
+              {profile?.approved_tiers.includes(tier) ? '✓ ' : ''}{planById(tier).name}
             </button>
           ))}
         </div>
       </Card>
 
-      <Card title="Plan" hint="Changed automatically by Stripe payments. Use this to give a plan for free (e.g. Private Advisory clients).">
+      <Card title={t("Plan")} hint={t("Changed automatically by Stripe payments. Use this to give a plan for free (e.g. Private Advisory clients).")}>
         <div className="chips">
           {PLANS.map((p) => (
             <button key={p.id} className={`chip${profile?.plan === p.id && profile.plan_status === 'active' ? ' is-on' : ''}`} onClick={() => setPlan(p.id, 'active')}>
               {p.name}
             </button>
           ))}
-          <button className="chip" onClick={() => confirm('Remove access?') && setPlan(profile?.plan ?? 'accountable', 'canceled')}>No access</button>
+          <button className="chip" onClick={() => confirm(t('Remove access?')) && setPlan(profile?.plan ?? 'accountable', 'canceled')}>{t("No access")}</button>
         </div>
       </Card>
     </div>
@@ -322,34 +323,34 @@ function Thread({ clientId, coachId, name }: { clientId: string; coachId: string
     const { data, error } = await supabase.from('messages').insert({ client_id: clientId, sender_id: coachId, body }).select('id, sender_id, body, created_at, read_at').single();
     if (error) {
       setText(body);
-      return alert('Not sent: ' + error.message);
+      return alert(t('Not sent:') + ' ' + error.message);
     }
     setMsgs((list) => (list.some((x) => x.id === data.id) ? list : [...list, data]));
   };
 
   return (
-    <Card title={`Chat with ${name || 'client'}`}>
-      {msgs.length === 0 && <p className="empty">No messages yet.</p>}
+    <Card title={t('Chat with {name}', { name: name || t('client') })}>
+      {msgs.length === 0 && <p className="empty">{t("No messages yet.")}</p>}
       <div className="thread">
         {msgs.map((m) => (
           <div key={m.id} className={`bubble bubble--${m.sender_id === coachId ? 'me' : 'partner'}`}>
             <pre>{m.body}</pre>
             <time>
-              {new Date(m.created_at).toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' })}
-              {m.sender_id === coachId && m.read_at ? ' · seen' : ''}
+              {new Date(m.created_at).toLocaleString(locale(), { weekday: 'short', hour: '2-digit', minute: '2-digit' })}
+              {m.sender_id === coachId && m.read_at ? ` · ${t('seen')}` : ''}
             </time>
           </div>
         ))}
         <div ref={end} />
       </div>
       <div className="chips chips--small">
-        {['Proud of you 💪', 'Where is today’s check-in?', 'What got in the way?', 'Let’s talk — book a call'].map((n) => (
+        {['Proud of you 💪', 'Where is today’s check-in?', 'What got in the way?', 'Let’s talk — book a call'].map((q) => t(q)).map((n) => (
           <button key={n} className="chip" onClick={() => setText(n)}>{n}</button>
         ))}
       </div>
       <div className="composer">
-        <TextField value={text} onChange={setText} placeholder="Reply…" />
-        <button className="btn" disabled={!text.trim()} onClick={send}>Send</button>
+        <TextField value={text} onChange={setText} placeholder={t("Reply…")} />
+        <button className="btn" disabled={!text.trim()} onClick={send}>{t("Send")}</button>
       </div>
     </Card>
   );
@@ -383,36 +384,36 @@ function EventsManager() {
 
   return (
     <>
-      <Card title="New event" hint="Visible to Elite members in their Mind tab.">
-        <TextField label="Title" value={draft.title} onChange={(title) => setDraft({ ...draft, title })} placeholder="Training camp" />
+      <Card title={t("New event")} hint={t("Visible to Elite members in their Mind tab.")}>
+        <TextField label={t("Title")} value={draft.title} onChange={(title) => setDraft({ ...draft, title })} placeholder={t("Training camp")} />
         <div className="row">
           <label className="field" style={{ flex: 1 }}>
-            <span className="field__label">Date</span>
+            <span className="field__label">{t("Date")}</span>
             <input className="input" type="date" value={draft.starts_on} onChange={(e) => setDraft({ ...draft, starts_on: e.target.value })} />
           </label>
           <label className="field" style={{ flex: 1 }}>
-            <span className="field__label">Time</span>
+            <span className="field__label">{t("Time")}</span>
             <input className="input" type="time" value={draft.start_time} onChange={(e) => setDraft({ ...draft, start_time: e.target.value })} />
           </label>
         </div>
-        <TextField label="Location" value={draft.location} onChange={(location) => setDraft({ ...draft, location })} placeholder="Copenhagen" />
-        <TextField multiline label="Description" value={draft.description} onChange={(description) => setDraft({ ...draft, description })} />
-        <TextField label="Sign-up / info link (optional)" value={draft.signup_url} onChange={(signup_url) => setDraft({ ...draft, signup_url })} placeholder="https://…" />
-        <button className="btn" disabled={!draft.title || !draft.starts_on} onClick={save}>Publish event</button>
+        <TextField label={t("Location")} value={draft.location} onChange={(location) => setDraft({ ...draft, location })} placeholder={t("Copenhagen")} />
+        <TextField multiline label={t("Description")} value={draft.description} onChange={(description) => setDraft({ ...draft, description })} />
+        <TextField label={t("Sign-up / info link (optional)")} value={draft.signup_url} onChange={(signup_url) => setDraft({ ...draft, signup_url })} placeholder="https://…" />
+        <button className="btn" disabled={!draft.title || !draft.starts_on} onClick={save}>{t("Publish event")}</button>
       </Card>
-      <Card title="Events">
-        {events.length === 0 && <p className="empty">No events yet.</p>}
+      <Card title={t("Events")}>
+        {events.length === 0 && <p className="empty">{t("No events yet.")}</p>}
         {events.map((e) => (
           <div key={e.id} className="event">
             <div className="event__date">
               <strong>{Number(e.starts_on.slice(-2))}</strong>
-              <small>{new Date(e.starts_on).toLocaleDateString(undefined, { month: 'short' })}</small>
+              <small>{new Date(e.starts_on).toLocaleDateString(locale(), { month: 'short' })}</small>
             </div>
             <div className="event__body">
               <strong>{e.title}</strong>
-              <small className="muted">{[e.start_time, e.location].filter(Boolean).join(' · ')} · {rsvps[e.id] ?? 0} going</small>
-              <button className="btn btn--link danger" style={{ alignSelf: 'flex-start' }} onClick={async () => { if (confirm(`Delete “${e.title}”?`)) { await supabase.from('events').delete().eq('id', e.id); load(); } }}>
-                Delete
+              <small className="muted">{[e.start_time, e.location].filter(Boolean).join(' · ')} · {t('{n} going', { n: rsvps[e.id] ?? 0 })}</small>
+              <button className="btn btn--link danger" style={{ alignSelf: 'flex-start' }} onClick={async () => { if (confirm(t('Delete “{title}”?', { title: e.title }))) { await supabase.from('events').delete().eq('id', e.id); load(); } }}>
+                {t("Delete")}
               </button>
             </div>
           </div>

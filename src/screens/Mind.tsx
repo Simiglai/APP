@@ -1,7 +1,8 @@
+import { locale, t } from '../i18n';
 import { useState } from 'react';
 import { useStore } from '../lib/store';
 import { hasFeature } from '../lib/plans';
-import { WORKSHEETS, type Worksheet } from '../content/worksheets';
+import { getWorksheets, type Worksheet } from '../content/worksheets';
 import { COACH_NAME } from '../config';
 import { Card, Locked, Scale, TextField } from '../ui';
 
@@ -9,6 +10,7 @@ export default function Mind({ onUpgrade }: { onUpgrade: () => void }) {
   const { state, activeTier } = useStore();
   const [open, setOpen] = useState<string | null>(null);
   const tier = activeTier;
+  const WORKSHEETS = getWorksheets();
   const sheet = WORKSHEETS.find((w) => w.id === open);
 
   if (sheet && hasFeature(tier, 'worksheets')) return <WorksheetView sheet={sheet} onBack={() => setOpen(null)} />;
@@ -16,12 +18,12 @@ export default function Mind({ onUpgrade }: { onUpgrade: () => void }) {
   return (
     <div className="stack">
       <header className="page-head">
-        <h1>Mind</h1>
-        <p className="muted">Train the mind like you train the body.</p>
+        <h1>{t("Mind")}</h1>
+        <p className="muted">{t("Train the mind like you train the body.")}</p>
       </header>
 
       {hasFeature(tier, 'worksheets') ? (
-        <Card title="Mental worksheets" hint="Do one per week. Share it with your coach when you’re done.">
+        <Card title={t("Mental worksheets")} hint={t("Do one per week. Share it with your coach when you’re done.")}>
           <div className="list">
             {WORKSHEETS.map((w) => {
               const entry = state.worksheets[w.id];
@@ -31,7 +33,7 @@ export default function Mind({ onUpgrade }: { onUpgrade: () => void }) {
                   <span>
                     <strong>{w.title}</strong>
                     <small className="muted">
-                      {w.minutes} min{entry?.sharedAt ? ' · shared ✓' : filled ? ' · in progress' : ''}
+                      {w.minutes} min{entry?.sharedAt ? ` · ${t('shared ✓')}` : filled ? ` · ${t('in progress')}` : ''}
                     </small>
                   </span>
                   <span aria-hidden>›</span>
@@ -41,14 +43,14 @@ export default function Mind({ onUpgrade }: { onUpgrade: () => void }) {
           </div>
         </Card>
       ) : (
-        <Locked feature="worksheets" title="Mental worksheets" onUpgrade={onUpgrade}>
-          <p>Fear setting, breaking limiting beliefs, a letter from your future self, wheel of life, a pressure plan and more.</p>
+        <Locked feature="worksheets" title={t("Mental worksheets")} onUpgrade={onUpgrade}>
+          <p>{t("Fear setting, breaking limiting beliefs, a letter from your future self, wheel of life, a pressure plan and more.")}</p>
         </Locked>
       )}
 
       {hasFeature(tier, 'events') ? <Events /> : (
-        <Locked feature="events" title="Events" onUpgrade={onUpgrade}>
-          <p>Training camps, workshops and meet-ups with {COACH_NAME} and the community.</p>
+        <Locked feature="events" title={t("Events")} onUpgrade={onUpgrade}>
+          <p>{t('Training camps, workshops and meet-ups with {coach} and the community.', { coach: COACH_NAME })}</p>
         </Locked>
       )}
     </div>
@@ -59,23 +61,23 @@ function Events() {
   const { state, toggleRsvp } = useStore();
   const upcoming = state.events.filter((e) => e.date >= new Date().toISOString().slice(0, 10)).sort((a, b) => a.date.localeCompare(b.date));
   return (
-    <Card title="Events" hint="Train together. Grow together.">
-      {upcoming.length === 0 && <p className="empty">No upcoming events yet — new events will appear here.</p>}
+    <Card title={t("Events")} hint={t("Train together. Grow together.")}>
+      {upcoming.length === 0 && <p className="empty">{t("No upcoming events yet — new events will appear here.")}</p>}
       {upcoming.map((e) => {
         const going = state.rsvps.includes(e.id);
         return (
           <div key={e.id} className="event">
             <div className="event__date">
               <strong>{new Date(e.date).getDate()}</strong>
-              <small>{new Date(e.date).toLocaleDateString(undefined, { month: 'short' })}</small>
+              <small>{new Date(e.date).toLocaleDateString(locale(), { month: 'short' })}</small>
             </div>
             <div className="event__body">
               <strong>{e.title}</strong>
               <small className="muted">{[e.time, e.location].filter(Boolean).join(' · ')}</small>
               <p className="small">{e.description}</p>
               <div className="row">
-                <button className={`chip${going ? ' is-on' : ''}`} onClick={() => toggleRsvp(e.id)}>{going ? '✓ I’m going' : 'I’m going'}</button>
-                {e.signupUrl && <a className="btn btn--link" href={e.signupUrl} target="_blank" rel="noopener">Details ›</a>}
+                <button className={`chip${going ? ' is-on' : ''}`} onClick={() => toggleRsvp(e.id)}>{going ? t('✓ I’m going') : t('I’m going')}</button>
+                {e.signupUrl && <a className="btn btn--link" href={e.signupUrl} target="_blank" rel="noopener">{t("Details ›")}</a>}
               </div>
             </div>
           </div>
@@ -92,7 +94,7 @@ function WorksheetView({ sheet, onBack }: { sheet: Worksheet; onBack: () => void
   const set = (key: string, v: string | number) => saveWorksheet(sheet.id, { values: { ...values, [key]: v } });
 
   const share = () => {
-    const lines = [`🧠 Worksheet: ${sheet.title}`];
+    const lines = [`🧠 ${t('Worksheet')}: ${sheet.title}`];
     for (const f of sheet.fields) {
       if (f.type === 'heading') continue;
       const v = values[f.key];
@@ -105,7 +107,7 @@ function WorksheetView({ sheet, onBack }: { sheet: Worksheet; onBack: () => void
   return (
     <div className="stack">
       <header className="page-head">
-        <button className="btn btn--link" style={{ alignSelf: 'flex-start' }} onClick={onBack}>‹ All worksheets</button>
+        <button className="btn btn--link" style={{ alignSelf: 'flex-start' }} onClick={onBack}>{t("‹ All worksheets")}</button>
         <h1>{sheet.title}</h1>
         <p className="muted">{sheet.intro}</p>
       </header>
@@ -127,9 +129,9 @@ function WorksheetView({ sheet, onBack }: { sheet: Worksheet; onBack: () => void
         )}
       </Card>
       {entry?.sharedAt ? (
-        <p className="done-banner">✓ Shared with your coach. You can keep editing and share again.</p>
+        <p className="done-banner">{t('✓ Shared with your coach. You can keep editing and share again.')}</p>
       ) : null}
-      <button className="btn btn--big" onClick={share}>Share with my coach</button>
+      <button className="btn btn--big" onClick={share}>{t("Share with my coach")}</button>
     </div>
   );
 }

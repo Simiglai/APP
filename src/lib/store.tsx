@@ -5,6 +5,7 @@ import { COACH_NAME, defaultCurrency } from '../config';
 import type { Tier } from './plans';
 import { insertMessage, pullAll, pushKey, toMessage } from './sync';
 import { supabase } from './supabase';
+import { byLang, t } from '../i18n';
 
 /**
  * Local-first store, synced to Supabase.
@@ -43,7 +44,17 @@ export const emptyDay = (date: string): DayEntry => ({
   eveningDoneAt: null,
 });
 
-export const defaultTraining: TrainingWeek = [
+const DEFAULT_TRAINING_DA: TrainingWeek = [
+  { title: 'Styrke overkrop', details: 'Armstrækninger 4x12, roning 4x10, skulderpres 3x10, planke 3x45 sek', rest: false },
+  { title: 'Zone 2-kondition', details: '40 min roligt løb / cykling i snakketempo', rest: false },
+  { title: 'Styrke underkrop', details: 'Squats 4x10, udfald 3x12, rumænsk dødløft 3x10, tåhævninger 3x15', rest: false },
+  { title: 'Mobilitet + core', details: '20 min mobilitetsflow, dead bugs, sideplanke', rest: false },
+  { title: 'Fuld krop + intervaller', details: 'Cirkel x4: burpees, kettlebell swings, pull-ups, 400 m løb', rest: false },
+  { title: 'Lang gåtur / sport', details: '60+ min udendørs — vandring, leg, bevægelse for sjov', rest: false },
+  { title: 'Hvile og restitution', details: 'Udstrækning, søvn, planlæg ugen', rest: true },
+];
+
+const DEFAULT_TRAINING_EN: TrainingWeek = [
   { title: 'Upper body strength', details: 'Push-ups 4x12, rows 4x10, overhead press 3x10, plank 3x45s', rest: false },
   { title: 'Zone 2 cardio', details: '40 min easy run / bike, conversational pace', rest: false },
   { title: 'Lower body strength', details: 'Squats 4x10, lunges 3x12, RDL 3x10, calf raises 3x15', rest: false },
@@ -53,7 +64,9 @@ export const defaultTraining: TrainingWeek = [
   { title: 'Rest & recover', details: 'Stretch, sleep, plan the week ahead', rest: true },
 ];
 
-const initialState: AppState = {
+export const defaultTraining = (): TrainingWeek => byLang({ en: DEFAULT_TRAINING_EN, da: DEFAULT_TRAINING_DA });
+
+const initialState = (): AppState => ({
   profile: {
     name: '',
     identity: '',
@@ -72,13 +85,13 @@ const initialState: AppState = {
   },
   days: {},
   goals: [],
-  training: defaultTraining,
+  training: defaultTraining(),
   messages: [],
   weeks: {},
   worksheets: {},
   rsvps: [],
   events: [],
-};
+});
 
 export const emptyWeek = (weekStart: string): WeekReview => ({
   weekStart,
@@ -96,9 +109,9 @@ type Cache = { state: AppState; pending: string[] };
 const isUuid = (s: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
 
 const withDefaults = (saved: Partial<AppState>): AppState => ({
-  ...initialState,
+  ...initialState(),
   ...saved,
-  profile: { ...initialState.profile, ...saved.profile, partnerName: COACH_NAME },
+  profile: { ...initialState().profile, ...saved.profile, partnerName: COACH_NAME },
   // goal ids must be UUIDs for the database
   goals: (saved.goals ?? []).map((g) => (isUuid(g.id) ? g : { ...g, id: crypto.randomUUID() })),
 });
@@ -179,7 +192,7 @@ export const computeStreak = (days: Record<string, Pick<DayEntry, 'morningDoneAt
 
 export function StoreProvider({ userId, email, children }: { userId: string; email: string; children: ReactNode }) {
   const cached = useMemo(() => readCache(userId), [userId]);
-  const [state, setState] = useState<AppState>(cached?.state ?? initialState);
+  const [state, setState] = useState<AppState>(cached?.state ?? initialState());
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('loading');
   const [loaded, setLoaded] = useState(!!cached); // show cached data right away
   const pending = useRef(new Set<string>(cached?.pending ?? []));
@@ -454,19 +467,20 @@ export const useStore = () => {
 
 /** Plain-text summary of a day, used to share a check-in with the coach. */
 export const daySummary = (name: string, d: DayEntry) => {
-  const lines = [`✅ ${name || 'Me'} — daily check-in (${d.date})`];
-  if (d.purpose) lines.push(`🎯 Purpose: ${d.purpose}`);
-  const top = d.top3.filter((t) => t.text);
-  if (top.length) lines.push('🏆 Top 3:', ...top.map((t) => `  ${t.done ? '☑' : '☐'} ${t.text}`));
-  if (d.discipline.text) lines.push(`🔥 Discipline challenge: ${d.discipline.text}${d.discipline.done ? ' — DONE' : ''}`);
-  if (d.training.text) lines.push(`💪 Training: ${d.training.text}${d.training.done ? ' — DONE' : ''}`);
-  const acts = d.identityActions.filter((t) => t.text);
-  if (acts.length) lines.push('🪞 Identity actions:', ...acts.map((t) => `  ${t.done ? '☑' : '☐'} ${t.text}`));
-  if (d.connect.text) lines.push(`🤝 Connect: ${d.connect.text}${d.connect.done ? ' — DONE' : ''}`);
-  if (d.socialLimit != null) lines.push(`📱 Social media: ${d.socialActual ?? '?'} / ${d.socialLimit} min`);
+  const lines = [`✅ ${t('{name} — daily check-in ({date})', { name: name || t('Me'), date: d.date })}`];
+  const done = (c: { done: boolean }) => (c.done ? ` — ${t('DONE')}` : '');
+  if (d.purpose) lines.push(`🎯 ${t('Purpose')}: ${d.purpose}`);
+  const top = d.top3.filter((x) => x.text);
+  if (top.length) lines.push(`🏆 ${t('Top 3')}:`, ...top.map((x) => `  ${x.done ? '☑' : '☐'} ${x.text}`));
+  if (d.discipline.text) lines.push(`🔥 ${t('Discipline challenge')}: ${d.discipline.text}${done(d.discipline)}`);
+  if (d.training.text) lines.push(`💪 ${t('Training')}: ${d.training.text}${done(d.training)}`);
+  const acts = d.identityActions.filter((x) => x.text);
+  if (acts.length) lines.push(`🪞 ${t('Identity actions')}:`, ...acts.map((x) => `  ${x.done ? '☑' : '☐'} ${x.text}`));
+  if (d.connect.text) lines.push(`🤝 ${t('Connect')}: ${d.connect.text}${done(d.connect)}`);
+  if (d.socialLimit != null) lines.push(`📱 ${t('Social media')}: ${d.socialActual ?? '?'} / ${d.socialLimit} min`);
   const happy = d.happy.filter(Boolean);
-  if (happy.length) lines.push(`😊 Happy about: ${happy.join(', ')}`);
+  if (happy.length) lines.push(`😊 ${t('Happy about')}: ${happy.join(', ')}`);
   for (const [q, a] of Object.entries(d.answers)) if (a.trim()) lines.push(`❓ ${q}\n   → ${a.trim()}`);
-  if (d.rating) lines.push(`⭐ Day rating: ${d.rating}/10`);
+  if (d.rating) lines.push(`⭐ ${t('Day rating')}: ${d.rating}/10`);
   return lines.join('\n');
 };

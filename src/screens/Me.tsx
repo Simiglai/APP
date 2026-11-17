@@ -1,3 +1,4 @@
+import { t, useLang } from '../i18n';
 import { useStore } from '../lib/store';
 import { addDays, todayKey } from '../lib/dates';
 import { Card, TextField } from '../ui';
@@ -6,8 +7,9 @@ import { planById } from '../lib/plans';
 import { formatPrice } from '../config';
 
 export default function Me({ onWeekly, onGoals, onMembership }: { onWeekly: () => void; onGoals: () => void; onMembership: () => void }) {
-  const { state, updateProfile, getDay, streak, activeTier, syncStatus } = useStore();
+  const { state, updateProfile, getDay, streak, activeTier, syncStatus, userId } = useStore();
   const p = state.profile;
+  const { lang, setLang } = useLang();
 
   const last14 = Array.from({ length: 14 }, (_, i) => getDay(addDays(todayKey(), i - 13)));
   const checkins = Object.values(state.days).filter((d) => d.morningDoneAt).length;
@@ -18,34 +20,34 @@ export default function Me({ onWeekly, onGoals, onMembership }: { onWeekly: () =
   return (
     <div className="stack">
       <header className="page-head">
-        <h1>{p.name || 'Me'}</h1>
-        <p className="muted">Identity first. Results follow.</p>
+        <h1>{p.name || t('Me')}</h1>
+        <p className="muted">{t('Identity first. Results follow.')}</p>
       </header>
 
       <div className="stats-grid">
-        <div><strong>{streak}</strong><span>Current streak</span></div>
-        <div><strong>{checkins}</strong><span>Check-ins</span></div>
-        <div><strong>{disciplineWins}</strong><span>Discipline wins</span></div>
-        <div><strong>{avgRating}</strong><span>Avg day rating</span></div>
+        <div><strong>{streak}</strong><span>{t("Current streak")}</span></div>
+        <div><strong>{checkins}</strong><span>{t("Check-ins")}</span></div>
+        <div><strong>{disciplineWins}</strong><span>{t("Discipline wins")}</span></div>
+        <div><strong>{avgRating}</strong><span>{t("Avg day rating")}</span></div>
       </div>
 
       <button className="card plan-badge" onClick={onMembership}>
         <span>
-          <small className="muted">Your membership</small>
-          <strong>{activeTier ? `${planById(activeTier).name} · ${formatPrice(planById(activeTier).price[p.currency], p.currency)}/mo` : 'No active plan'}</strong>
+          <small className="muted">{t("Your membership")}</small>
+          <strong>{activeTier ? `${planById(activeTier).name} · ${formatPrice(planById(activeTier).price[p.currency], p.currency)}/${t('mo')}` : t('No active plan')}</strong>
         </span>
-        <span className="edit-link">Manage ›</span>
+        <span className="edit-link">{t("Manage ›")}</span>
       </button>
 
-      <Card title="Goals" hint={`${state.goals.length} active goal${state.goals.length === 1 ? '' : 's'} — your daily Top 3 should move these forward.`}>
-        <button className="btn" onClick={onGoals}>Open goals</button>
+      <Card title={t("Goals")} hint={t(state.goals.length === 1 ? '{n} active goal — your daily Top 3 should move it forward.' : '{n} active goals — your daily Top 3 should move these forward.', { n: state.goals.length })}>
+        <button className="btn" onClick={onGoals}>{t("Open goals")}</button>
       </Card>
 
-      <Card title="Weekly review" icon="📅" hint="Every Sunday: score the week and set next week’s focus.">
-        <button className="btn" onClick={onWeekly}>Open weekly review</button>
+      <Card title={t("Weekly review")} icon="📅" hint={t("Every Sunday: score the week and set next week’s focus.")}>
+        <button className="btn" onClick={onWeekly}>{t("Open weekly review")}</button>
       </Card>
 
-      <Card title="Last 14 days" icon="📊" hint="Mood (top) and energy (bottom)">
+      <Card title={t("Last 14 days")} icon="📊" hint={t("Mood (top) and energy (bottom)")}>
         <div className="bars">
           {last14.map((d) => (
             <div key={d.date} className="bars__col" title={d.date}>
@@ -57,23 +59,36 @@ export default function Me({ onWeekly, onGoals, onMembership }: { onWeekly: () =
         </div>
       </Card>
 
-      <Card title="My identity" icon="🪞" hint="Who am I?">
-        <TextField multiline value={p.identity} onChange={(identity) => updateProfile({ identity })} placeholder="I am…" />
+      <Card title={t("My identity")} icon="🪞" hint={t("Who am I?")}>
+        <TextField multiline value={p.identity} onChange={(identity) => updateProfile({ identity })} placeholder={t("I am…")} />
       </Card>
-      <Card title="Who I am becoming" icon="🚀" hint="What can I become?">
-        <TextField multiline value={p.becoming} onChange={(becoming) => updateProfile({ becoming })} placeholder="I am becoming…" />
+      <Card title={t("Who I am becoming")} icon="🚀" hint={t("What can I become?")}>
+        <TextField multiline value={p.becoming} onChange={(becoming) => updateProfile({ becoming })} placeholder={t("I am becoming…")} />
       </Card>
-      <Card title="My purpose" icon="🧭">
-        <TextField multiline value={p.purpose} onChange={(purpose) => updateProfile({ purpose })} placeholder="My mission is…" />
+      <Card title={t("My purpose")} icon="🧭">
+        <TextField multiline value={p.purpose} onChange={(purpose) => updateProfile({ purpose })} placeholder={t("My mission is…")} />
       </Card>
-      <Card title="Core values" icon="⚓">
-        <div className="chips">{p.values.map((v) => <span key={v} className="chip is-on">{v}</span>)}</div>
+      <Card title={t("Core values")} icon="⚓">
+        <div className="chips">{p.values.map((v) => <span key={v} className="chip is-on">{t(v)}</span>)}</div>
+      </Card>
+
+      <Card title={t("Language")}>
+        <div className="segmented" role="radiogroup" aria-label="Language">
+          {(['da', 'en'] as const).map((l) => (
+            <button key={l} role="radio" aria-checked={lang === l} className={lang === l ? 'is-on' : ''} onClick={() => {
+                supabase.from('profiles').update({ language: l }).eq('id', userId).then(() => {});
+                setLang(l);
+              }}>
+              {l === 'da' ? 'Dansk' : 'English'}
+            </button>
+          ))}
+        </div>
       </Card>
 
       <p className="muted small center">
-        {{ loading: 'Loading…', synced: '✓ All changes saved', saving: 'Saving…', offline: 'Offline — changes will sync when you’re back online' }[syncStatus]}
+        {t({ loading: 'Loading…', synced: '✓ All changes saved', saving: 'Saving…', offline: 'Offline — changes will sync when you’re back online' }[syncStatus])}
       </p>
-      <button className="btn btn--link danger" onClick={() => confirm('Log out on this device?') && supabase.auth.signOut()}>Log out</button>
+      <button className="btn btn--link danger" onClick={() => confirm(t('Log out on this device?')) && supabase.auth.signOut()}>{t("Log out")}</button>
     </div>
   );
 }
