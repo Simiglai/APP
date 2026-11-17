@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { StoreProvider, useStore } from './lib/store';
 import { supabase } from './lib/supabase';
-import Auth from './screens/Auth';
+import Auth, { NewPassword } from './screens/Auth';
 import Coach from './screens/Coach';
 import Onboarding from './screens/Onboarding';
 import Today from './screens/Today';
@@ -69,15 +69,20 @@ function Shell() {
 
 export default function App() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
+  const [recovering, setRecovering] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data } = supabase.auth.onAuthStateChange((_event, s) => setSession(s));
+    const { data } = supabase.auth.onAuthStateChange((event, s) => {
+      setSession(s);
+      if (event === 'PASSWORD_RECOVERY') setRecovering(true); // opened the reset link from the email
+    });
     return () => data.subscription.unsubscribe();
   }, []);
 
   if (session === undefined) return <div className="splash"><div className="spinner" aria-label="Loading" /></div>;
   if (!session) return <main className="app"><Auth /></main>;
+  if (recovering) return <main className="app"><NewPassword onDone={() => setRecovering(false)} /></main>;
   return (
     // key: a different account gets a fresh store
     <StoreProvider key={session.user.id} userId={session.user.id} email={session.user.email ?? ''}>
