@@ -69,6 +69,18 @@ insert into public.training_programs (user_id, week) values (auth.uid(), '[]');
 select pg_temp.check((select count(*) from public.training_programs) = 1, 'anna (perform) can now use training programs');
 select pg_temp.fails($$select public.coach_set_plan(auth.uid(), 'elite')$$, 'anna cannot call coach_set_plan');
 
+-- ── Call-first approval for Perform/Elite
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', false);
+update public.profiles set requested_tier = 'elite', requested_at = now() where id = auth.uid();
+select pg_temp.check((select requested_tier from public.profiles where id = auth.uid()) = 'elite', 'anna can request a call for elite');
+select pg_temp.fails($$update public.profiles set approved_tiers = '{elite}' where id = auth.uid()$$, 'anna cannot approve herself');
+select pg_temp.fails($$select public.coach_set_approval(auth.uid(), '{elite}')$$, 'anna cannot call coach_set_approval');
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-00000000000c', false);
+select pg_temp.check((select requested_tier from public.coach_client_overview where name = 'Anna') = 'elite', 'coach sees anna''s request');
+select public.coach_set_approval('00000000-0000-0000-0000-0000000000a1', '{perform,elite}');
+select pg_temp.check((select approved_tiers from public.coach_client_overview where name = 'Anna') = '{perform,elite}', 'coach approved anna');
+select pg_temp.fails($$select public.coach_set_approval('00000000-0000-0000-0000-0000000000a1', '{gold}')$$, 'unknown tier rejected');
+
 -- ── Not signed in
 reset role; set role anon;
 select set_config('request.jwt.claim.sub', '', false);

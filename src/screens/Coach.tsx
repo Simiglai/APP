@@ -19,7 +19,13 @@ type ClientRow = {
   energy_7d: number | null;
   rating_7d: number | null;
   unread: number;
+  requested_tier: Tier | null;
+  requested_at: string | null;
+  approved_tiers: Tier[];
 };
+
+/** Asked for a call about Perform/Elite and not approved for it yet. */
+const pendingRequest = (c: ClientRow) => (c.requested_tier && !c.approved_tiers.includes(c.requested_tier) ? c.requested_tier : null);
 
 const daysSince = (date: string | null) => (date ? Math.round((Date.parse(todayKey()) - Date.parse(date)) / 86_400_000) : null);
 
@@ -59,9 +65,9 @@ export default function Coach() {
 
   if (open) return <main className="app"><ClientDetail client={open} onBack={() => { setOpen(null); load(); }} /></main>;
 
-  const sorted = [...(clients ?? [])].sort((a, b) => b.unread - a.unread || flags(b).length - flags(a).length || a.name.localeCompare(b.name));
+  const sorted = [...(clients ?? [])].sort((a, b) => Number(!!pendingRequest(b)) - Number(!!pendingRequest(a)) || b.unread - a.unread || flags(b).length - flags(a).length || a.name.localeCompare(b.name));
   const active = sorted.filter((c) => c.plan_status === 'active' || c.plan_status === 'trialing');
-  const needAttention = sorted.filter((c) => flags(c).length || c.unread);
+  const needAttention = sorted.filter((c) => flags(c).length || c.unread || pendingRequest(c));
 
   return (
     <main className="app">
@@ -105,6 +111,7 @@ export default function Coach() {
                         {c.mood_7d !== null && ` · mood ${c.mood_7d}`}
                         {c.rating_7d !== null && ` · day ${c.rating_7d}/10`}
                       </small>
+                      {pendingRequest(c) && <small className="request">📞 Call requested for {planById(pendingRequest(c)!).name} — approve after the call</small>}
                       {f.length > 0 && <small className="flag">⚠ {f.join(' · ')}</small>}
                     </span>
                     <span aria-hidden>›</span>
@@ -121,7 +128,7 @@ export default function Coach() {
 
 function ClientDetail({ client, onBack }: { client: ClientRow; onBack: () => void }) {
   const { userId } = useStore();
-  const [profile, setProfile] = useState<{ identity: string; becoming: string; purpose: string; values: string[]; plan: Tier; plan_status: string } | null>(null);
+  const [profile, setProfile] = useState<{ identity: string; becoming: string; purpose: string; values: string[]; plan: Tier; plan_status: string; approved_tiers: Tier[]; requested_tier: Tier | null } | null>(null);
   const [days, setDays] = useState<DayEntry[]>([]);
   const [weeks, setWeeks] = useState<WeekReview[]>([]);
   const [sheets, setSheets] = useState<{ worksheet_id: string; data: Record<string, string | number>; shared_at: string }[]>([]);
@@ -130,7 +137,7 @@ function ClientDetail({ client, onBack }: { client: ClientRow; onBack: () => voi
   useEffect(() => {
     const since = addDays(todayKey(), -27);
     Promise.all([
-      supabase.from('profiles').select('identity, becoming, purpose, values, plan, plan_status').eq('id', client.id).single(),
+      supabase.from('profiles').select('identity, becoming, purpose, values, plan, plan_status, approved_tiers, requested_tier').eq('id', client.id).single(),
       supabase.from('days').select('date, data').eq('user_id', client.id).gte('date', since).order('date', { ascending: false }),
       supabase.from('weekly_reviews').select('week_start, data').eq('user_id', client.id).order('week_start', { ascending: false }).limit(6),
       supabase.from('worksheets').select('worksheet_id, data, shared_at').eq('user_id', client.id).not('shared_at', 'is', null),
@@ -146,6 +153,22 @@ function ClientDetail({ client, onBack }: { client: ClientRow; onBack: () => voi
     const { error } = await supabase.rpc('coach_set_plan', { client: client.id, new_plan: plan, new_status: status });
     if (error) return alert(error.message);
     setProfile((p) => (p ? { ...p, plan, plan_status: status } : p));
+  };
+
+  const toggleApproval = async (tier: Tier) => {
+    if (!profile) return;
+    const approved = profile.approved_tiers.includes(tier);
+    const next = approved ? profile.approved_tiers.filter((t) => t !== tier) : [...profile.approved_tiers, tier];
+    const { error } = await supabase.rpc('coach_set_approval', { client: client.id, tiers: next });
+    if (error) return alert(error.message);
+    setProfile({ ...profile, approved_tiers: next });
+    if (!approved) {
+      await supabase.from('messages').insert({
+        client_id: client.id,
+        sender_id: userId,
+        body: `✅ Great talking to you! You're approved for ${planById(tier).name}. Open Me → Membership in the app to get started.`,
+      });
+    }
   };
 
   const last14 = Array.from({ length: 14 }, (_, i) => addDays(todayKey(), -i));
@@ -230,6 +253,19 @@ function ClientDetail({ client, onBack }: { client: ClientRow; onBack: () => voi
       )}
 
       <Thread clientId={client.id} coachId={userId} name={client.name} />
+
+      <Card title="Approve Perform / Elite" hint="After the call, approve the plan(s) this client may join. They get a message and can then pay in the app.">
+        {profile?.requested_tier && !profile.approved_tiers.includes(profile.requested_tier) && (
+          <p className="call-note">📞 Requested a call for {planById(profile.requested_tier).name}.</p>
+        )}
+        <div className="chips">
+          {(['perform', 'elite'] as Tier[]).map((t) => (
+            <button key={t} className={`chip${profile?.approved_tiers.includes(t) ? ' is-on' : ''}`} onClick={() => toggleApproval(t)}>
+              {profile?.approved_tiers.includes(t) ? '✓ ' : ''}{planById(t).name}
+            </button>
+          ))}
+        </div>
+      </Card>
 
       <Card title="Plan" hint="Changed automatically by Stripe payments. Use this to give a plan for free (e.g. Private Advisory clients).">
         <div className="chips">

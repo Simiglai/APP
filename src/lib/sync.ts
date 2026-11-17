@@ -20,6 +20,9 @@ export type ServerProfile = {
   onboarded: boolean;
   plan: Profile['plan'];
   plan_status: Profile['planStatus'];
+  approved_tiers: Profile['approvedTiers'];
+  requested_tier: Profile['requestedTier'];
+  requested_at: string | null;
 };
 
 export const toMessage = (row: { id: string; sender_id: string; body: string; created_at: string; read_at: string | null }, me: string): PartnerMessage => ({
@@ -77,7 +80,17 @@ export async function pushKey(key: string, s: AppState, userId: string): Promise
       const p = s.profile;
       res = await supabase
         .from('profiles')
-        .update({ name: p.name, identity: p.identity, becoming: p.becoming, purpose: p.purpose, values: p.values, currency: p.currency, onboarded: p.onboarded })
+        .update({
+          name: p.name,
+          identity: p.identity,
+          becoming: p.becoming,
+          purpose: p.purpose,
+          values: p.values,
+          currency: p.currency,
+          onboarded: p.onboarded,
+          requested_tier: p.requestedTier,
+          requested_at: p.requestedAt,
+        })
         .eq('id', userId);
       break;
     }

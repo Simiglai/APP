@@ -13,6 +13,9 @@ export type Profile = {
   plan: Tier;
   planStatus: 'none' | 'trialing' | 'active' | 'past_due' | 'canceled';
   role: 'client' | 'coach';
+  approvedTiers: Tier[]; // Perform/Elite the coach has approved after a call
+  requestedTier: Tier | null; // plan the client booked a call for
+  requestedAt: string | null;
   currency: Currency;
   onboarded: boolean;
 };

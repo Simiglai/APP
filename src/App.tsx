@@ -80,7 +80,7 @@ export default function App() {
   if (!session) return <main className="app"><Auth /></main>;
   return (
     // key: a different account gets a fresh store
-    <StoreProvider key={session.user.id} userId={session.user.id}>
+    <StoreProvider key={session.user.id} userId={session.user.id} email={session.user.email ?? ''}>
       <Shell />
     </StoreProvider>
   );

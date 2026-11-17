@@ -27,6 +27,8 @@ Defined in `src/lib/plans.ts` (prices/features) — each higher tier includes ev
 | **Elite** | $500 / 3.499 kr. per month | + mental worksheets, events |
 | **Private Personal Advisory** | Free 30-min call | Opens the Calendly link in `BOOKING_URL` (`src/config.ts`) |
 
+**Perform and Elite start with a call**: the client taps “Book a call to apply” (opens Calendly prefilled with their name + email, and tells the coach in chat); the coach approves the plan in the client's page of the dashboard; only then can the client pay. Enforced in the database (`approved_tiers`, `coach_set_approval`) and in `create-checkout`. Clients already subscribed switch plans in the app (prorated); the Stripe portal only handles card, receipts and cancelling.
+
 Locked features show an upgrade card. Plan switching is instant in preview mode until Stripe payments are connected.
 
 - Mental worksheets: `src/content/worksheets.ts` (fear setting, limiting beliefs, future-self letter, wheel of life, pressure plan, values & non-negotiables) — add new ones there.

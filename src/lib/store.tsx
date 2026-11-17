@@ -64,6 +64,9 @@ const initialState: AppState = {
     plan: 'accountable',
     planStatus: 'none',
     role: 'client',
+    approvedTiers: [],
+    requestedTier: null,
+    requestedAt: null,
     currency: defaultCurrency(),
     onboarded: false,
   },
@@ -140,6 +143,7 @@ export type SyncStatus = 'loading' | 'synced' | 'saving' | 'offline';
 type Store = {
   state: AppState;
   userId: string;
+  email: string;
   syncStatus: SyncStatus;
   /** The plan the client has actually paid for (null = no active subscription). The coach has everything. */
   activeTier: Tier | null;
@@ -173,7 +177,7 @@ export const computeStreak = (days: Record<string, Pick<DayEntry, 'morningDoneAt
   return n;
 };
 
-export function StoreProvider({ userId, children }: { userId: string; children: ReactNode }) {
+export function StoreProvider({ userId, email, children }: { userId: string; email: string; children: ReactNode }) {
   const cached = useMemo(() => readCache(userId), [userId]);
   const [state, setState] = useState<AppState>(cached?.state ?? initialState);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('loading');
@@ -260,10 +264,13 @@ export function StoreProvider({ userId, children }: { userId: string; children: 
                   values: profile.values ?? [],
                   currency: profile.currency,
                   onboarded: profile.onboarded,
+                  requestedTier: profile.requested_tier,
+                  requestedAt: profile.requested_at,
                 }),
             role: profile.role,
             plan: profile.plan,
             planStatus: profile.plan_status,
+            approvedTiers: profile.approved_tiers ?? [],
           },
         };
       });
@@ -414,6 +421,7 @@ export function StoreProvider({ userId, children }: { userId: string; children: 
     () => ({
       state,
       userId,
+      email,
       syncStatus,
       activeTier,
       getDay,
@@ -431,7 +439,7 @@ export function StoreProvider({ userId, children }: { userId: string; children: 
       refresh,
       streak,
     }),
-    [state, userId, syncStatus, activeTier, getDay, updateDay, updateProfile, saveGoal, deleteGoal, updateGoal, setTraining, sendMessage, saveWorksheet, toggleRsvp, getWeek, updateWeek, refresh, streak],
+    [state, userId, email, syncStatus, activeTier, getDay, updateDay, updateProfile, saveGoal, deleteGoal, updateGoal, setTraining, sendMessage, saveWorksheet, toggleRsvp, getWeek, updateWeek, refresh, streak],
   );
 
   if (!loaded) return <div className="splash"><div className="spinner" aria-label="Loading" /></div>;

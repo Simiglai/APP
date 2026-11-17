@@ -39,9 +39,33 @@ Deno.serve(async (req) => {
     const back = typeof returnUrl === 'string' && /^https?:\/\//.test(returnUrl) ? returnUrl : Deno.env.get('SITE_URL') ?? 'http://localhost:5173';
 
     const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-    const { data: profile } = await admin.from('profiles').select('name, plan_status, stripe_customer_id').eq('id', user.id).single();
+    const { data: profile } = await admin
+      .from('profiles')
+      .select('name, plan, plan_status, stripe_customer_id, stripe_subscription_id, approved_tiers')
+      .eq('id', user.id)
+      .single();
+
+    // Perform and Elite are by application: only after a call and the coach's approval.
+    if (tier !== 'accountable' && !(profile?.approved_tiers ?? []).includes(tier)) {
+      return json({ error: 'Book a call first — you can join this plan once your coach has approved you.' }, 403);
+    }
+
+    const prices = await stripe('prices', { 'lookup_keys[]': `ps_${tier}_monthly`, active: 'true' }, 'GET');
+    const price = prices.data?.[0];
+    if (!price) return json({ error: 'This plan is not available right now.' }, 500);
+
+    // Already subscribed → switch the existing subscription (prorated) instead of starting a second one.
     if (profile?.plan_status === 'active' || profile?.plan_status === 'trialing') {
-      return json({ error: 'You already have an active plan — use “Manage subscription” to change it.' }, 409);
+      if (profile.plan === tier) return json({ error: 'You are already on this plan.' }, 409);
+      if (!profile.stripe_subscription_id) return json({ error: 'Your plan is managed by your coach — send them a message to change it.' }, 409);
+      const sub = await stripe(`subscriptions/${profile.stripe_subscription_id}`, undefined, 'GET');
+      await stripe(`subscriptions/${sub.id}`, {
+        'items[0][id]': sub.items.data[0].id,
+        'items[0][price]': price.id,
+        proration_behavior: 'create_prorations',
+        'metadata[tier]': tier,
+      });
+      return json({ url: `${back}?checkout=changed` }); // the webhook updates the plan
     }
 
     // one Stripe customer per user
@@ -51,10 +75,6 @@ Deno.serve(async (req) => {
       customer = c.id as string;
       await admin.from('profiles').update({ stripe_customer_id: customer }).eq('id', user.id);
     }
-
-    const prices = await stripe('prices', { 'lookup_keys[]': `ps_${tier}_monthly`, active: 'true' }, 'GET');
-    const price = prices.data?.[0];
-    if (!price) return json({ error: 'This plan is not available right now.' }, 500);
 
     const session = await stripe('checkout/sessions', {
       mode: 'subscription',

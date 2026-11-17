@@ -254,3 +254,6 @@ a.btn { text-decoration: none; display: inline-block; text-align: center; }
 .review { padding: 10px 0; border-bottom: 1px solid var(--line); }
 .review:last-child { border-bottom: none; }
 .review summary { cursor: pointer; }
+
+.call-note { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--accent-soft); font-size: 0.9rem; font-weight: 500; }
+.request { color: var(--heading); font-weight: 700; }
