@@ -65,7 +65,7 @@ Live at **https://ps-daily.netlify.app** (Netlify site `ps-daily`, free plan; th
 1. Add `STRIPE_SECRET_KEY` to Supabase Edge Function secrets (checkout is off until then).
 2. Rotate the Stripe test key, then repeat setup with live keys (`scripts/stripe_setup.py`, webhook endpoint, billing portal).
 3. Custom SMTP in Supabase (e.g. Resend) → turn email confirmation back on and enable password reset.
-4. Optional: custom domain (e.g. app.patricksimiglai.com) → add it in Netlify + update Supabase Auth URLs and `SITE_URL`.
+4. Custom domain **app.patricksimiglai.com** is added in Netlify and allowed in Supabase Auth. Remaining: DNS `CNAME app → ps-daily.netlify.app` at the domain registrar; once it resolves, turn on Force HTTPS in Netlify and switch Supabase Auth site URL + `SITE_URL` to it.
 5. Create Patrick's own account and set `role = 'coach'`.
 
 ## Brand
