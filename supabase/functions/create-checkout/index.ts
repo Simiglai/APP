@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
       await admin.from('profiles').update({ stripe_customer_id: customer }).eq('id', user.id);
     }
 
-    const prices = await stripe('prices', { 'lookup_keys[]': `ps_${tier}_monthly`, active: 'true' });
+    const prices = await stripe('prices', { 'lookup_keys[]': `ps_${tier}_monthly`, active: 'true' }, 'GET');
     const price = prices.data?.[0];
     if (!price) return json({ error: 'This plan is not available right now.' }, 500);
 
