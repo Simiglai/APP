@@ -57,11 +57,16 @@ psql -d <empty db> -v ON_ERROR_STOP=1 -f local_stub.sql -f ../migrations/2026111
   - `stripe-webhook` — keeps `profiles.plan` / `plan_status` in sync; events are verified by re-fetching them from Stripe
   - Needs the Supabase secret `STRIPE_SECRET_KEY`. Clients without an active plan see the plan picker.
 
+## Hosting
+
+Live at **https://ps-daily.netlify.app** (Netlify site `ps-daily`, free plan; the "Powered by Netlify" badge is turned off because it covered the tab bar). Publish a new version with `scripts/deploy.sh`. `public/_headers` and `public/_redirects` configure caching, security headers and the manifest type. Supabase Auth site URL and the `SITE_URL` function secret point at this address.
+
 ### Before launch
-1. Rotate the Stripe test key, then repeat setup with live keys (`scripts/stripe_setup.py`, webhook endpoint, billing portal).
-2. Custom SMTP in Supabase (e.g. Resend) → turn email confirmation back on and enable password reset.
-3. Host the app (e.g. Vercel/Netlify) and set Supabase Auth site URL + redirect URLs to the real domain.
-4. Create Patrick's own account and set `role = 'coach'`.
+1. Add `STRIPE_SECRET_KEY` to Supabase Edge Function secrets (checkout is off until then).
+2. Rotate the Stripe test key, then repeat setup with live keys (`scripts/stripe_setup.py`, webhook endpoint, billing portal).
+3. Custom SMTP in Supabase (e.g. Resend) → turn email confirmation back on and enable password reset.
+4. Optional: custom domain (e.g. app.patricksimiglai.com) → add it in Netlify + update Supabase Auth URLs and `SITE_URL`.
+5. Create Patrick's own account and set `role = 'coach'`.
 
 ## Brand
 
