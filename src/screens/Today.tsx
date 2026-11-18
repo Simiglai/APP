@@ -6,6 +6,8 @@ import { dailyPrompt, dailyQuestions, dailyQuote, disciplineIdeas, socialIntents
 import type { DayEntry, Meals } from '../lib/types';
 import { BrandLogo, Card, CheckRow, Scale, TextField } from '../ui';
 import { hasFeature } from '../lib/plans';
+import { TodayWorkout } from './Library';
+import { TRAININGPEAKS_URL } from './Train';
 
 const MOODS = ['😞', '😕', '😐', '🙂', '😄'];
 const ENERGY = ['🪫', '😴', '⚡', '⚡⚡', '🔥'];
@@ -16,7 +18,7 @@ const MEAL_LABELS: [keyof Meals, string][] = [
   ['snacks', t("Snacks")],
 ];
 
-export default function Today({ onShare, onWeekly }: { onShare: () => void; onWeekly: () => void }) {
+export default function Today({ onShare, onWeekly, onTrain }: { onShare: () => void; onWeekly: () => void; onTrain: () => void }) {
   const { state, getDay, updateDay, streak, sendMessage, activeTier } = useStore();
   const [date, setDate] = useState(todayKey());
   const d = getDay(date);
@@ -24,8 +26,8 @@ export default function Today({ onShare, onWeekly }: { onShare: () => void; onWe
   const isToday = date === todayKey();
   const quote = dailyQuote(date);
   const hasPrograms = hasFeature(activeTier, 'training');
-  // Clients without training programs plan their own session
-  const plan = hasPrograms ? state.training[weekdayIndex(date)] : { title: '', details: '', rest: false };
+  // Perform/Elite follow their TrainingPeaks program; everyone can use the workout of the day
+  const plan = { title: '', details: '', rest: false };
   const name = state.profile.name;
 
   const questions = dailyQuestions(date);
@@ -221,8 +223,11 @@ export default function Today({ onShare, onWeekly }: { onShare: () => void; onWe
         </div>
       </Card>
 
-      <Card title={t("Training")} icon="💪" hint={hasPrograms ? t('Plan for {day}: {session}', { day: prettyDate(date).split(',')[0], session: plan.title }) : t('What will you do for your body today?')}>
-        {plan.details && <p className="muted small">{plan.details}</p>}
+      <Card title={t("Training")} icon="💪" hint={t('What will you do for your body today?')}>
+        {hasPrograms && (
+          <a className="btn btn--ghost" href={TRAININGPEAKS_URL} target="_blank" rel="noopener">{t('See today’s session in TrainingPeaks ↗')}</a>
+        )}
+        {isToday && <TodayWorkout onOpenLibrary={onTrain} />}
         <CheckRow
           done={d.training.done}
           text={d.training.text || plan.title}

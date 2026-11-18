@@ -91,6 +91,8 @@ const initialState = (): AppState => ({
   worksheets: {},
   rsvps: [],
   events: [],
+  library: [],
+  schedule: {},
 });
 
 export const emptyWeek = (weekStart: string): WeekReview => ({

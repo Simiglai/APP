@@ -33,7 +33,7 @@ export type DayEntry = {
   discipline: Check; // 1 thing that will challenge my discipline
   meals: Meals;
   water: number; // glasses
-  training: Check & { notes: string };
+  training: Check & { notes: string; workoutId?: string }; // workoutId: done with a library video
   // become the person who inspires me
   futureSelf: string; // what would the person I'm becoming do today?
   identityActions: Check[]; // 3 actions that prove who I am
@@ -69,6 +69,18 @@ export type TrainingWeek = Workout[]; // index 0 = Monday .. 6 = Sunday
 
 export type PartnerMessage = { id: string; from: 'me' | 'partner'; text: string; at: string; readAt?: string | null; pending?: boolean };
 
+export type WorkoutCategory = 'strength' | 'mobility' | 'recovery';
+export type LibraryWorkout = {
+  id: string;
+  title: string;
+  category: WorkoutCategory;
+  durationMin: number | null;
+  level: 'beginner' | 'intermediate' | 'advanced' | 'all' | null;
+  description: string;
+  videoUrl: string | null;
+  published: boolean;
+};
+
 export type CoachEvent = { id: string; title: string; date: string; time?: string; location: string; description: string; signupUrl?: string };
 
 export type WeekReview = {
@@ -92,6 +104,8 @@ export type AppState = {
   worksheets: Record<string, WorksheetEntry>;
   rsvps: string[]; // event ids
   events: CoachEvent[];
+  library: LibraryWorkout[];
+  schedule: Record<string, string>; // date → workout id (coach's pick for that day)
 };
 
 export type WorksheetEntry = { values: Record<string, string | number>; updatedAt: string; sharedAt: string | null };

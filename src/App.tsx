@@ -47,7 +47,7 @@ function Shell() {
   return (
     <>
       <main className="app">
-        {screen === 'today' && <Today onShare={() => go('partner')} onWeekly={() => go('week')} />}
+        {screen === 'today' && <Today onShare={() => go('partner')} onWeekly={() => go('week')} onTrain={() => go('train')} />}
         {screen === 'train' && <Train onUpgrade={upgrade} />}
         {screen === 'mind' && <Mind onUpgrade={upgrade} />}
         {screen === 'partner' && <Partner />}

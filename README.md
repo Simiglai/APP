@@ -9,7 +9,7 @@ A daily planner + accountability app for Patrick Simiglai's coaching clients —
 | **Today** | Daily motivation quote + identity reminder + reflection prompt · mood / energy / sleep check-in · **2 daily challenge questions** (Mirror + Challenge) · **Be the person who inspires you** (what would my future self do today + 3 identity actions) · **purpose for the day** · **top 3 goals** · **5 things that make me happy** · **1 discipline challenge** (with suggestions) · **fuel plan** (breakfast, lunch, dinner, snacks + water) · today's **training** session · **socials** (who I'll connect with, social media limit + rule) · "Lock in my day" · evening review (wins, lesson, actual social media time vs limit, 1–10 rating) · Sunday weekly-review prompt · browse previous days |
 | **Goals** (under Me) | Long-term goals by life area (Health, Career, Relationships, Mind, Finance, Purpose) with a *why*, target date and milestone progress |
 | **Mind** | Mental worksheets (shareable with the coach) and events — Elite |
-| **Train** | Weekly training plan (editable per day), 3 templates (beginner, fat loss, 10k running), last-7-days completion |
+| **Train** | “Train with Patrick” video library (strength, mobility, recovery) with workout of the day for every plan; Perform/Elite also get a link to their personal TrainingPeaks program. Old row: | Weekly training plan (editable per day), 3 templates (beginner, fat loss, 10k running), last-7-days completion |
 | **Coach** | Accountability with the coach: today's status, post your check-in, quick nudges, share via WhatsApp/iMessage (Web Share / clipboard) |
 | **Weekly review** | Week stats + score, biggest win, where I fell short, when I acted like who I'm becoming, what I'll do differently, next week's focus — sent to the coach |
 | **Me** | **Who am I?** (identity) · **What can I become?** · purpose · core values · streak, check-ins, discipline wins, avg rating, 14-day mood/energy chart |
@@ -69,6 +69,10 @@ Live at **https://app.patricksimiglai.com** (also https://ps-daily.netlify.app; 
 3. Supabase sends auth emails via Resend SMTP (noreply@patricksimiglai.com). Remaining: Resend DNS records in Simply → domain verified → turn email confirmation on (`mailer_autoconfirm = false`).
 4. ✓ Custom domain app.patricksimiglai.com live with HTTPS.
 5. Create Patrick's own account and set `role = 'coach'`.
+
+## Workout library
+
+Coach dashboard → **Workouts**: add workouts (title, category strength/mobility/recovery, minutes, level, description, video link from YouTube — upload as *Unlisted* — Vimeo or an MP4 URL), hide/publish, and pick the workout of the day for the next 7 days. Days without a pick rotate through the library (Mon strength, Tue mobility, Wed strength, Thu recovery, Fri strength, Sat mobility, Sun recovery). Clients see it in the daily check-in and in the Train tab; “Done ✓” logs it as the day's training. Tables `workouts` and `workout_schedule` (RLS: any active plan can watch published workouts; only the coach edits). Test: `scripts/library_test.cjs`.
 
 ## Languages
 

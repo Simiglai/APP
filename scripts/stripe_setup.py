@@ -18,9 +18,9 @@ def post(path, data, idem):
     return r
 
 PLANS = [
-    ('accountable', 'Patrick Simiglai — Accountable', 'Daily check-in & planner, challenge questions, identity work, coach chat, weekly review & goals.', 34900, 5000),
-    ('perform', 'Patrick Simiglai — Perform', 'Everything in Accountable + personal training programs and TrainingPeaks connection.', 199900, 30000),
-    ('elite', 'Patrick Simiglai — Elite', 'Everything in Perform + mental worksheets and events.', 349900, 50000),
+    ('accountable', 'Patrick Simiglai — Accountable', 'Workout of the day + video library (strength, mobility, recovery), daily check-in & planner, challenge questions, identity work, coach chat, weekly review & goals.', 34900, 5000),
+    ('perform', 'Patrick Simiglai — Perform', 'Everything in Accountable + personal training program in TrainingPeaks, built for you. Starts with a call.', 199900, 30000),
+    ('elite', 'Patrick Simiglai — Elite', 'Everything in Perform + mental worksheets and events. Starts with a call.', 349900, 50000),
 ]
 out = {}
 for tier, name, desc, dkk, usd in PLANS:

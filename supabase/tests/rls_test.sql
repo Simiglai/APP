@@ -81,10 +81,30 @@ select public.coach_set_approval('00000000-0000-0000-0000-0000000000a1', '{perfo
 select pg_temp.check((select approved_tiers from public.coach_client_overview where name = 'Anna') = '{perform,elite}', 'coach approved anna');
 select pg_temp.fails($$select public.coach_set_approval('00000000-0000-0000-0000-0000000000a1', '{gold}')$$, 'unknown tier rejected');
 
+-- ── Workout library
+reset role;
+insert into auth.users (id, email) values ('00000000-0000-0000-0000-0000000000b1', 'nina@test'); -- signed up, never paid
+set role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-00000000000c', false);
+insert into public.workouts (id, title, category, duration_min, video_url) values
+  ('00000000-0000-0000-0000-0000000000f1', 'Full body strength', 'strength', 30, 'https://youtu.be/abc123'),
+  ('00000000-0000-0000-0000-0000000000f2', 'Draft mobility', 'mobility', 15, null);
+update public.workouts set published = false where id = '00000000-0000-0000-0000-0000000000f2';
+insert into public.workout_schedule (date, workout_id) values (current_date, '00000000-0000-0000-0000-0000000000f1');
+select pg_temp.check((select count(*) from public.workouts) = 2, 'coach sees drafts too');
+select pg_temp.fails($$insert into public.workouts (title, category, video_url) values ('x', 'strength', 'http://insecure')$$, 'video links must be https');
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', false);
+select pg_temp.check((select count(*) from public.workouts) = 1, 'paying client sees published workouts only');
+select pg_temp.check((select count(*) from public.workout_schedule) = 1, 'paying client sees workout of the day');
+select pg_temp.fails($$insert into public.workouts (title, category) values ('mine', 'strength')$$, 'client cannot add workouts');
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', false);
+select pg_temp.check((select count(*) from public.workouts) = 0, 'client without a plan sees no workouts');
+
 -- ── Not signed in
 reset role; set role anon;
 select set_config('request.jwt.claim.sub', '', false);
 select pg_temp.check((select count(*) from public.profiles) = 0, 'anonymous sees no profiles');
 select pg_temp.check((select count(*) from public.days) = 0, 'anonymous sees no days');
+select pg_temp.check((select count(*) from public.workouts) = 0, 'anonymous sees no workouts');
 reset role;
 \echo ALL RLS TESTS PASSED

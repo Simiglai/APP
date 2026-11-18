@@ -7,6 +7,7 @@ import { PLANS, planById, type Tier } from '../lib/plans';
 import { getWorksheets } from '../content/worksheets';
 import type { DayEntry, WeekReview } from '../lib/types';
 import { BrandLogo, Card, TextField } from '../ui';
+import CoachWorkouts from './CoachWorkouts';
 
 type ClientRow = {
   id: string;
@@ -45,7 +46,7 @@ const flags = (c: ClientRow) => {
 export default function Coach() {
   const [clients, setClients] = useState<ClientRow[] | null>(null);
   const [open, setOpen] = useState<ClientRow | null>(null);
-  const [tab, setTab] = useState<'clients' | 'events'>('clients');
+  const [tab, setTab] = useState<'clients' | 'workouts' | 'events'>('clients');
 
   const load = useCallback(async () => {
     const { data } = await supabase.from('coach_client_overview').select('*');
@@ -86,11 +87,14 @@ export default function Coach() {
           </div>
           <div className="segmented">
             <button className={tab === 'clients' ? 'is-on' : ''} onClick={() => setTab('clients')}>{t('Clients')}</button>
+            <button className={tab === 'workouts' ? 'is-on' : ''} onClick={() => setTab('workouts')}>{t('Workouts')}</button>
             <button className={tab === 'events' ? 'is-on' : ''} onClick={() => setTab('events')}>{t('Events')}</button>
           </div>
         </header>
 
-        {tab === 'events' ? (
+        {tab === 'workouts' ? (
+          <CoachWorkouts />
+        ) : tab === 'events' ? (
           <EventsManager />
         ) : clients === null ? (
           <div className="spinner" />

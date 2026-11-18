@@ -6,7 +6,7 @@
  *   profile · training · day:<YYYY-MM-DD> · goal:<uuid> · goaldel:<uuid> · week:<YYYY-MM-DD> · sheet:<worksheetId> · rsvp:<eventId>
  */
 import { supabase } from './supabase';
-import type { AppState, CoachEvent, DayEntry, Goal, PartnerMessage, Profile, TrainingWeek, WeekReview, WorksheetEntry } from './types';
+import type { AppState, CoachEvent, LibraryWorkout, DayEntry, Goal, PartnerMessage, Profile, TrainingWeek, WeekReview, WorksheetEntry } from './types';
 
 export type ServerProfile = {
   id: string;
@@ -35,7 +35,7 @@ export const toMessage = (row: { id: string; sender_id: string; body: string; cr
 
 /** Everything the signed-in client has on the server. */
 export async function pullAll(userId: string): Promise<{ profile: ServerProfile; data: Partial<AppState> }> {
-  const [profile, days, goals, weeks, sheets, training, messages, events, rsvps] = await Promise.all([
+  const [profile, days, goals, weeks, sheets, training, messages, events, rsvps, workouts, schedule] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', userId).single(),
     supabase.from('days').select('date, data').eq('user_id', userId).order('date', { ascending: false }).limit(400),
     supabase.from('goals').select('id, data, created_at').eq('user_id', userId),
@@ -45,6 +45,8 @@ export async function pullAll(userId: string): Promise<{ profile: ServerProfile;
     supabase.from('messages').select('id, sender_id, body, created_at, read_at').eq('client_id', userId).order('created_at').limit(500),
     supabase.from('events').select('*').order('starts_on'),
     supabase.from('event_rsvps').select('event_id').eq('user_id', userId),
+    supabase.from('workouts').select('*').eq('published', true).order('created_at', { ascending: false }),
+    supabase.from('workout_schedule').select('date, workout_id'),
   ]);
   if (profile.error) throw profile.error;
 
@@ -66,6 +68,8 @@ export async function pullAll(userId: string): Promise<{ profile: ServerProfile;
       signupUrl: e.signup_url ?? undefined,
     })) as CoachEvent[],
     rsvps: (rsvps.data ?? []).map((r) => r.event_id),
+    library: (workouts.data ?? []).map(toWorkout),
+    schedule: Object.fromEntries((schedule.data ?? []).map((r) => [r.date, r.workout_id])),
   };
   if (training.data?.week && (training.data.week as TrainingWeek).length === 7) data.training = training.data.week as TrainingWeek;
   return { profile: profile.data as ServerProfile, data };
@@ -142,6 +146,18 @@ export async function pushKey(key: string, s: AppState, userId: string): Promise
   console.warn(`sync: ${key} failed, will retry`, res.error.message);
   return false;
 }
+
+type WorkoutRow = { id: string; title: string; category: LibraryWorkout['category']; duration_min: number | null; level: LibraryWorkout['level']; description: string; video_url: string | null; published: boolean };
+export const toWorkout = (r: WorkoutRow): LibraryWorkout => ({
+  id: r.id,
+  title: r.title,
+  category: r.category,
+  durationMin: r.duration_min,
+  level: r.level,
+  description: r.description,
+  videoUrl: r.video_url,
+  published: r.published,
+});
 
 export async function insertMessage(clientId: string, senderId: string, body: string) {
   const { data, error } = await supabase
