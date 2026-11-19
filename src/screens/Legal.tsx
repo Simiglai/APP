@@ -24,10 +24,18 @@ const Company = () => (
   <p>
     {COMPANY.name}
     <br />
-    CVR: {COMPANY.cvr}
-    <br />
-    {COMPANY.address}
-    <br />
+    {COMPANY.cvr && (
+      <>
+        CVR: {COMPANY.cvr}
+        <br />
+      </>
+    )}
+    {COMPANY.address && (
+      <>
+        {COMPANY.address}
+        <br />
+      </>
+    )}
     <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>
   </p>
 );

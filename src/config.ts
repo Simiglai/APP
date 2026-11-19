@@ -23,8 +23,8 @@ export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_kQh6ZfmaGeEVd5vt87EtVA_T
 /** Business details shown in the privacy policy and terms of sale. */
 export const COMPANY = {
   name: 'Patrick Simiglai',
-  cvr: '[CVR-nummer]', // TODO Patrick: CVR number
-  address: '[Adresse]', // TODO Patrick: business address
+  cvr: '', // TODO Patrick: CVR / company number — decide DK or US company before taking real payments
+  address: '', // TODO Patrick: business address
   email: 'ps@patricksimiglai.com',
   web: 'https://app.patricksimiglai.com',
 };
