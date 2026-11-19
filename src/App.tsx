@@ -4,6 +4,7 @@ import type { Session } from '@supabase/supabase-js';
 import { StoreProvider, useStore } from './lib/store';
 import { supabase } from './lib/supabase';
 import Auth, { NewPassword } from './screens/Auth';
+import Legal, { PRIVACY_PATH, TERMS_PATH } from './screens/Legal';
 import Coach from './screens/Coach';
 import Onboarding from './screens/Onboarding';
 import Today from './screens/Today';
@@ -81,6 +82,9 @@ export default function App() {
     return () => data.subscription.unsubscribe();
   }, []);
 
+  // public pages (no login needed)
+  if (location.pathname === PRIVACY_PATH) return <Legal page="privacy" />;
+  if (location.pathname === TERMS_PATH) return <Legal page="terms" />;
   if (session === undefined) return <div className="splash"><div className="spinner" aria-label="Loading" /></div>;
   if (!session) return <main className="app"><Auth /></main>;
   if (recovering) return <main className="app"><NewPassword onDone={() => setRecovering(false)} /></main>;

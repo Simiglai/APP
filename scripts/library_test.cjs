@@ -13,7 +13,7 @@ const step = (m) => console.log('•', m);
   const signup = async (p, name, mail) => {
     await p.goto('http://localhost:5173');
     await p.fill('input[autocomplete="given-name"]', name); await p.fill('input[type=email]', mail); await p.fill('input[type=password]', PW);
-    await p.click('text=Opret konto'); await p.waitForSelector('text=Hvad skal vi kalde dig?', { timeout: 20000 });
+    await p.check('.consent input'); await p.click('text=Opret konto'); await p.waitForSelector('text=Hvad skal vi kalde dig?', { timeout: 20000 });
   };
   let k, c;
   try {

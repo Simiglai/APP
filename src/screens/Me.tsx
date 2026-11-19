@@ -1,8 +1,8 @@
 import { t, useLang } from '../i18n';
 import { useStore } from '../lib/store';
 import { addDays, todayKey } from '../lib/dates';
-import { Card, TextField } from '../ui';
-import { supabase } from '../lib/supabase';
+import { Card, LegalLinks, TextField } from '../ui';
+import { callFunction, supabase } from '../lib/supabase';
 import { planById } from '../lib/plans';
 import { formatPrice } from '../config';
 
@@ -10,6 +10,23 @@ export default function Me({ onWeekly, onGoals, onMembership }: { onWeekly: () =
   const { state, updateProfile, getDay, streak, activeTier, syncStatus, userId } = useStore();
   const p = state.profile;
   const { lang, setLang } = useLang();
+
+  const deleteAccount = async () => {
+    if (!confirm(t('Delete your account and all your data? This cannot be undone.'))) return;
+    if (!confirm(t('Are you sure? Your subscription is cancelled immediately.'))) return;
+    try {
+      await callFunction('delete-account', {});
+      try {
+        localStorage.removeItem(`ps-daily:${userId}`);
+      } catch {
+        /* ignore */
+      }
+      await supabase.auth.signOut();
+      alert(t('Your account has been deleted.'));
+    } catch (e) {
+      alert(e instanceof Error ? t(e.message) : t('Something went wrong — please try again.'));
+    }
+  };
 
   const last14 = Array.from({ length: 14 }, (_, i) => getDay(addDays(todayKey(), i - 13)));
   const checkins = Object.values(state.days).filter((d) => d.morningDoneAt).length;
@@ -89,6 +106,8 @@ export default function Me({ onWeekly, onGoals, onMembership }: { onWeekly: () =
         {t({ loading: 'Loading…', synced: '✓ All changes saved', saving: 'Saving…', offline: 'Offline — changes will sync when you’re back online' }[syncStatus])}
       </p>
       <button className="btn btn--link danger" onClick={() => confirm(t('Log out on this device?')) && supabase.auth.signOut()}>{t("Log out")}</button>
+      <button className="btn btn--link muted small" onClick={deleteAccount}>{t('Delete my account')}</button>
+      <LegalLinks />
     </div>
   );
 }

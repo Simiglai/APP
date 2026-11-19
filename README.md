@@ -78,6 +78,13 @@ Coach dashboard → **Workouts**: add workouts (title, category strength/mobilit
 
 Danish and English. Danish phones get Danish automatically; clients can switch under **Me → Language**. All UI text goes through `t()` (`src/i18n.tsx`) with the Danish dictionary in `src/i18n.da.ts` (keys are the English texts; missing keys fall back to English). Content has Danish versions too: quotes, daily questions, discipline ideas, social rules (`src/lib/motivation.ts`), worksheets (`src/content/worksheets.ts`), training templates and the default week. Language and currency (DKK for Danish) are stored on the profile at sign-up; Stripe Checkout and the billing portal open in Danish for Danish clients.
 
+## Legal & privacy
+
+- **Privacy policy** at `/privatliv` and **terms of sale** at `/handelsbetingelser` (Danish/English, `src/screens/Legal.tsx`) — DRAFTS for Patrick to review. Company details (CVR, address) in `COMPANY` in `src/config.ts`; bump `LEGAL_VERSION` on material changes.
+- Sign-up requires accepting terms + privacy and explicit consent to health data (GDPR art. 9); stored as `profiles.consent_version` / `consented_at`.
+- New subscriptions require accepting that access starts immediately so the 14-day withdrawal right lapses; recorded in the Stripe subscription metadata.
+- **Delete my account** (Me): `delete-account` function cancels the Stripe subscription and deletes the user and all their data (invoices stay in Stripe for bookkeeping). Test: `scripts/delete_account_test.py`.
+
 ## Brand
 
 Follows the Patrick Simiglai design manual (2022): Montserrat (bold headings, light body, medium UI), navy `#12264a`, dark grey `#313132`, light grey `#ececec`, black and white. The logo files in `public/brand/` are extracted directly from the manual — never redraw them. Light mode = navy on light grey; dark mode = white on navy.

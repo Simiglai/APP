@@ -19,3 +19,15 @@ export const formatPrice = (amount: number, currency: Currency) =>
  */
 export const SUPABASE_URL = 'https://olpjikegieacdcqzenvn.supabase.co';
 export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_kQh6ZfmaGeEVd5vt87EtVA_TYdhPlso';
+
+/** Business details shown in the privacy policy and terms of sale. */
+export const COMPANY = {
+  name: 'Patrick Simiglai',
+  cvr: '[CVR-nummer]', // TODO Patrick: CVR number
+  address: '[Adresse]', // TODO Patrick: business address
+  email: 'ps@patricksimiglai.com',
+  web: 'https://app.patricksimiglai.com',
+};
+
+/** Bump when the terms or privacy policy change materially; stored with each client's consent. */
+export const LEGAL_VERSION = '2026-11-19';

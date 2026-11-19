@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
     const { data: { user } } = await userClient.auth.getUser();
     if (!user) return json({ error: 'Please log in again.' }, 401);
 
-    const { tier, currency, returnUrl, locale } = await req.json();
+    const { tier, currency, returnUrl, locale, waiver } = await req.json();
     if (!TIERS.includes(tier)) return json({ error: 'Unknown plan.' }, 400);
     const cur = currency === 'usd' ? 'usd' : 'dkk';
     const back = typeof returnUrl === 'string' && /^https?:\/\//.test(returnUrl) ? returnUrl : Deno.env.get('SITE_URL') ?? 'http://localhost:5173';
@@ -68,6 +68,9 @@ Deno.serve(async (req) => {
       return json({ url: `${back}?checkout=changed` }); // the webhook updates the plan
     }
 
+    // New subscriptions: the client must accept the terms incl. immediate start (withdrawal right lapses).
+    if (waiver !== true) return json({ error: 'Please accept the terms of sale first.' }, 400);
+
     // one Stripe customer per user
     let customer = profile?.stripe_customer_id as string | null;
     if (!customer) {
@@ -87,6 +90,12 @@ Deno.serve(async (req) => {
       locale: locale === 'da' ? 'da' : 'auto',
       'subscription_data[metadata][user_id]': user.id,
       'subscription_data[metadata][tier]': tier,
+      'subscription_data[metadata][terms_accepted_at]': new Date().toISOString(),
+      'subscription_data[metadata][withdrawal_waiver]': 'access starts immediately; 14-day withdrawal right lapses (FAL §18 stk. 2 nr. 13)',
+      'custom_text[submit][message]':
+        locale === 'da'
+          ? 'Adgangen starter med det samme. Du har accepteret, at fortrydelsesretten dermed bortfalder. Opsig når som helst i appen.'
+          : 'Access starts immediately. You have agreed that the right of withdrawal therefore lapses. Cancel any time in the app.',
       success_url: `${back}?checkout=success`,
       cancel_url: `${back}?checkout=cancel`,
     });

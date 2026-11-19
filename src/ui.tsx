@@ -95,3 +95,12 @@ export function Locked({ feature, title, children, onUpgrade }: { feature: Featu
     </section>
   );
 }
+
+/** Links to the privacy policy and terms of sale. */
+export function LegalLinks() {
+  return (
+    <p className="muted small center legal-links">
+      <a href="/privatliv">{t('Privacy policy')}</a> · <a href="/handelsbetingelser">{t('Terms of sale')}</a>
+    </p>
+  );
+}

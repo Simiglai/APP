@@ -4,6 +4,8 @@ import { useStore } from '../lib/store';
 import { PLANS, type Tier } from '../lib/plans';
 import { BOOKING_URL, COACH_NAME, formatPrice, type Currency } from '../config';
 import { callFunction, supabase } from '../lib/supabase';
+import { LegalLinks } from '../ui';
+import { TERMS_PATH } from './Legal';
 
 /**
  * Plans + Stripe checkout. With `gate`, it is the first screen for clients without an active plan.
@@ -45,7 +47,11 @@ export default function Membership({ onBack, gate }: { onBack?: () => void; gate
   };
 
   // new subscription, or a switch of the existing one (handled by the same function)
-  const choose = (tier: Tier) => go('create-checkout', { tier, currency: currency.toLowerCase() }, tier);
+  const [waiver, setWaiver] = useState(false);
+  const choose = (tier: Tier) => {
+    if (!activeTier && !waiver) return setError(t('Please tick the box above the plans first.'));
+    go('create-checkout', { tier, currency: currency.toLowerCase(), waiver: activeTier ? undefined : true }, tier);
+  };
 
   return (
     <div className="stack">
@@ -73,6 +79,16 @@ export default function Membership({ onBack, gate }: { onBack?: () => void; gate
         </Card>
       )}
       {error && <p className="error">{error}</p>}
+
+      {!activeTier && (
+        <label className="consent card">
+          <input type="checkbox" checked={waiver} onChange={(e) => { setWaiver(e.target.checked); setError(''); }} />
+          <span>
+            {t('I accept the')} <a href={TERMS_PATH} target="_blank" rel="noopener">{t('terms of sale')}</a>
+            {t(' and that my access starts immediately, so the 14-day right of withdrawal lapses.')}
+          </span>
+        </label>
+      )}
 
       {PLANS.map((p) => {
         const on = p.id === activeTier;
@@ -128,6 +144,7 @@ export default function Membership({ onBack, gate }: { onBack?: () => void; gate
       </section>
 
       <p className="muted small center">{t("Secure payments by Stripe. Monthly subscription, cancel any time.")}</p>
+      <LegalLinks />
       {gate && (
         <button className="btn btn--link" onClick={() => supabase.auth.signOut()}>{t("Log out")}</button>
       )}

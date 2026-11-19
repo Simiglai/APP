@@ -28,7 +28,7 @@ let customer;
     c = await mk();
     await c.goto('http://localhost:5173');
     await c.fill('input[autocomplete="given-name"]', 'Bo'); await c.fill('input[type=email]', clientEmail); await c.fill('input[type=password]', PW);
-    await c.click('text=Create account');
+    await c.check('.consent input'); await c.click('text=Create account');
     await c.waitForSelector('text=What should we call you?', { timeout: 20000 });
     await c.click('text=Continue'); await c.fill('textarea', 'I am disciplined.'); await c.click('text=Continue');
     await c.locator('textarea').nth(0).fill('A leader.'); await c.click('text=Continue'); await c.click('text=Health'); await c.click('text=Start my first day');
@@ -50,7 +50,7 @@ let customer;
     k = await mk();
     await k.goto('http://localhost:5173');
     await k.fill('input[autocomplete="given-name"]', 'Coach'); await k.fill('input[type=email]', coachEmail); await k.fill('input[type=password]', PW);
-    await k.click('text=Create account');
+    await k.check('.consent input'); await k.click('text=Create account');
     await k.waitForSelector('text=What should we call you?', { timeout: 20000 });
     sql(`update profiles set role='coach' from auth.users u where u.id=profiles.id and u.email='${coachEmail}'`);
     await k.reload();
@@ -73,7 +73,7 @@ let customer;
     step('chat: ' + JSON.stringify(msgs));
 
     // existing Accountable subscriber upgrades in place
-    const co = fn('create-checkout', tok, { tier: 'accountable', currency: 'dkk' });
+    const co = fn('create-checkout', tok, { tier: 'accountable', currency: 'dkk', waiver: true });
     step('Accountable checkout (no call needed): ' + (co.url ? 'ok' : JSON.stringify(co)));
     customer = sql(`select stripe_customer_id from profiles where id='${uid}'`)[0].stripe_customer_id;
     const pm = stripe('payment_methods/pm_card_visa/attach', { customer }).id;

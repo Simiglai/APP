@@ -501,4 +501,22 @@ export const DA: Record<string, string> = {
   Hide: 'Skjul',
   Publish: 'Publicér',
   'no video': 'ingen video',
+  // account deletion
+  'Delete my account': 'Slet min konto',
+  'Delete your account and all your data? This cannot be undone.': 'Slet din konto og alle dine data? Det kan ikke fortrydes.',
+  'Are you sure? Your subscription is cancelled immediately.': 'Er du sikker? Dit abonnement opsiges med det samme.',
+  'Your account has been deleted.': 'Din konto er slettet.',
+  'The coach account cannot be deleted from the app.': 'Coach-kontoen kan ikke slettes fra appen.',
+  'Could not cancel your subscription — please try again or contact your coach.': 'Dit abonnement kunne ikke opsiges — prøv igen, eller kontakt din coach.',
+  // legal + consent
+  'Privacy policy': 'Privatlivspolitik',
+  'Terms of sale': 'Handelsbetingelser',
+  'I accept the': 'Jeg accepterer',
+  'terms of sale': 'handelsbetingelserne',
+  'and the': 'og',
+  'privacy policy': 'privatlivspolitikken',
+  ', and I consent to my check-in data (e.g. mood, sleep and training) being processed so my coach can follow me.': ', og jeg giver samtykke til, at mine check-in-data (fx humør, søvn og træning) behandles, så min coach kan følge mig.',
+  ' and that my access starts immediately, so the 14-day right of withdrawal lapses.': ', og at min adgang starter med det samme, så den 14-dages fortrydelsesret bortfalder.',
+  'Please tick the box above the plans first.': 'Sæt først flueben i feltet over medlemskaberne.',
+  'Please accept the terms of sale first.': 'Accepter venligst handelsbetingelserne først.',
 };

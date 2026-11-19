@@ -36,7 +36,7 @@ try:
     print('1. test client signed up', profile(uid))
 
     sql(f"update profiles set approved_tiers='{{perform}}' where id='{uid}'")  # coach approved after the call
-    co = fn('create-checkout', token, {'tier': 'perform', 'currency': 'dkk', 'locale': 'da', 'returnUrl': 'https://app.patricksimiglai.com/'})
+    co = fn('create-checkout', token, {'tier': 'perform', 'currency': 'dkk', 'locale': 'da', 'waiver': True, 'returnUrl': 'https://app.patricksimiglai.com/'})
     url = co.get('url', '')
     print('2. checkout url:', url[:45] + '…' if url else co)
     sess_id = url.split('/pay/')[1].split('#')[0] if '/pay/' in url else None
