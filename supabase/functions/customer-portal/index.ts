@@ -26,10 +26,21 @@ Deno.serve(async (req) => {
     const { returnUrl, locale } = await req.json().catch(() => ({}));
     const back = typeof returnUrl === 'string' && /^https?:\/\//.test(returnUrl) ? returnUrl : Deno.env.get('SITE_URL') ?? 'http://localhost:5173';
 
+    // use the app's own portal settings (no plan switching — upgrades need the coach's approval)
+    const configs = await fetch('https://api.stripe.com/v1/billing_portal/configurations?active=true&limit=100', {
+      headers: { Authorization: `Bearer ${key}` },
+    }).then((r) => r.json());
+    const configuration = configs?.data?.find((c: { metadata?: { app?: string } }) => c.metadata?.app === 'ps-daily')?.id;
+
     const res = await fetch('https://api.stripe.com/v1/billing_portal/sessions', {
       method: 'POST',
       headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ customer: profile.stripe_customer_id, return_url: `${back}?checkout=portal`, locale: locale === 'da' ? 'da' : 'auto' }),
+      body: new URLSearchParams({
+        customer: profile.stripe_customer_id,
+        return_url: `${back}?checkout=portal`,
+        locale: locale === 'da' ? 'da' : 'auto',
+        ...(configuration ? { configuration } : {}),
+      }),
     });
     const data = await res.json();
     if (!res.ok) return json({ error: data?.error?.message ?? 'Could not open billing portal.' }, 500);

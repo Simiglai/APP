@@ -64,8 +64,8 @@ psql -d <empty db> -v ON_ERROR_STOP=1 -f local_stub.sql -f ../migrations/2026111
 Live at **https://app.patricksimiglai.com** (also https://ps-daily.netlify.app; Netlify site `ps-daily`, free plan; the "Powered by Netlify" badge is turned off because it covered the tab bar). Publish a new version with `scripts/deploy.sh`. `public/_headers` and `public/_redirects` configure caching, security headers and the manifest type. Supabase Auth site URL and the `SITE_URL` function secret point at app.patricksimiglai.com (DNS: CNAME `app` → `ps-daily.netlify.app` at Simply; HTTPS certificate by Netlify).
 
 ### Before launch
-1. Add `STRIPE_SECRET_KEY` to Supabase Edge Function secrets (checkout is off until then).
-2. Rotate the Stripe test key, then repeat setup with live keys (`scripts/stripe_setup.py`, webhook endpoint, billing portal).
+1. ✓ Stripe is LIVE: `STRIPE_SECRET_KEY` in Supabase is the live key; live plans, webhook and billing portal created on 2026-11-19 (see `scripts/stripe_live_setup_function.ts`). The customer portal uses the configuration tagged `metadata.app = ps-daily`.
+2. Do one real purchase with your own card, then refund it in the Stripe dashboard.
 3. Supabase sends auth emails via Resend SMTP (noreply@patricksimiglai.com). Remaining: Resend DNS records in Simply → domain verified → turn email confirmation on (`mailer_autoconfirm = false`).
 4. ✓ Custom domain app.patricksimiglai.com live with HTTPS.
 5. Create Patrick's own account and set `role = 'coach'`.
