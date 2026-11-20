@@ -24,12 +24,8 @@ const Company = () => (
   <p>
     {COMPANY.name}
     <br />
-    {COMPANY.cvr && (
-      <>
-        CVR: {COMPANY.cvr}
-        <br />
-      </>
-    )}
+    {COMPANY.registration}
+    <br />
     {COMPANY.address && (
       <>
         {COMPANY.address}
@@ -37,6 +33,12 @@ const Company = () => (
       </>
     )}
     <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>
+    {COMPANY.euRepresentative && (
+      <>
+        <br />
+        EU representative (GDPR art. 27): {COMPANY.euRepresentative}
+      </>
+    )}
   </p>
 );
 
@@ -65,7 +67,7 @@ function PrivacyDA() {
         <ul>
           <li>At levere appen og coachingen, du har købt — GDPR art. 6, stk. 1, litra b (aftale).</li>
           <li>At din coach kan følge dine check-ins og fremskridt — GDPR art. 9, stk. 2, litra a (udtrykkeligt samtykke).</li>
-          <li>Bogføring af betalinger — GDPR art. 6, stk. 1, litra c (bogføringsloven).</li>
+          <li>Bogføring af betalinger — GDPR art. 6, stk. 1, litra c (retlig forpligtelse).</li>
         </ul>
         <p>Vi bruger ikke dine data til markedsføring, sælger dem ikke og bruger ingen sporings- eller reklamecookies.</p>
       </Section>
@@ -82,7 +84,7 @@ function PrivacyDA() {
         <p>Nogle af disse leverandører kan overføre data til USA. Det sker på grundlag af EU-Kommissionens standardkontraktbestemmelser og/eller EU-US Data Privacy Framework.</p>
       </Section>
       <Section title="5. Hvor længe gemmer vi dine data?">
-        <p>Så længe du har en konto. Sletter du din konto, slettes alle dine data med det samme. Regnskabsbilag (fakturaer) opbevares i 5 år efter bogføringsloven.</p>
+        <p>Så længe du har en konto. Sletter du din konto, slettes alle dine data med det samme. Regnskabsbilag (fakturaer) opbevares så længe, regnskabsreglerne kræver det (typisk 5–7 år).</p>
       </Section>
       <Section title="6. Dine rettigheder">
         <ul>
@@ -124,7 +126,7 @@ function PrivacyEN() {
         <ul>
           <li>Providing the app and coaching you bought — GDPR Art. 6(1)(b) (contract).</li>
           <li>Letting your coach follow your check-ins and progress — GDPR Art. 9(2)(a) (explicit consent).</li>
-          <li>Bookkeeping of payments — GDPR Art. 6(1)(c) (Danish Bookkeeping Act).</li>
+          <li>Bookkeeping of payments — GDPR Art. 6(1)(c) (legal obligation).</li>
         </ul>
         <p>We do not use your data for marketing, never sell it, and use no tracking or advertising cookies.</p>
       </Section>
@@ -141,7 +143,7 @@ function PrivacyEN() {
         <p>Some of these providers may transfer data to the USA, based on the EU Standard Contractual Clauses and/or the EU-US Data Privacy Framework.</p>
       </Section>
       <Section title="5. How long we keep your data">
-        <p>As long as you have an account. If you delete your account, all your data is deleted immediately. Accounting records (invoices) are kept for 5 years as required by Danish law.</p>
+        <p>As long as you have an account. If you delete your account, all your data is deleted immediately. Accounting records (invoices) are kept as long as accounting rules require (typically 5–7 years).</p>
       </Section>
       <Section title="6. Your rights">
         <ul>
@@ -174,7 +176,7 @@ function TermsDA() {
         <p><b>Perform</b> og <b>Elite</b> kræver en forudgående gratis samtale og godkendelse fra din coach. <b>Privat personlig rådgivning</b> aftales individuelt.</p>
       </Section>
       <Section title="3. Priser og betaling">
-        <p>{prices(true)}. Priserne er inkl. moms, hvis sælger er momsregistreret. Betaling sker forud for hver måned med betalingskort via Stripe. Abonnementet fornyes automatisk hver måned, indtil det opsiges.</p>
+        <p>{prices(true)}. Priserne er inkl. eventuel moms. Betaling sker forud for hver måned med betalingskort via Stripe. Abonnementet fornyes automatisk hver måned, indtil det opsiges.</p>
       </Section>
       <Section title="4. Opsigelse og skift af medlemskab">
         <p>Du kan opsige når som helst i appen under Mig → Medlemskab → Kort, kvitteringer og opsigelse. Opsigelsen gælder fra udgangen af den betalte måned, og du har adgang indtil da. Skifter du medlemskab, reguleres prisen forholdsmæssigt.</p>
@@ -192,7 +194,7 @@ function TermsDA() {
         <p>Prisændringer varsles mindst 30 dage før, de træder i kraft, så du kan nå at opsige.</p>
       </Section>
       <Section title="9. Klage">
-        <p>Kontakt os først på <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>. Du kan også klage til <a href="https://www.forbrug.dk" target="_blank" rel="noopener">Nævnenes Hus</a> eller via EU-Kommissionens klageportal. Aftalen er underlagt dansk ret.</p>
+        <p>Kontakt os først på <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>. Du kan også klage til <a href="https://www.forbrug.dk" target="_blank" rel="noopener">Nævnenes Hus</a> eller via EU-Kommissionens klageportal. Aftalen er underlagt lovgivningen i Wyoming, USA. Som forbruger bevarer du altid den beskyttelse, du har efter de ufravigelige forbrugerregler i dit bopælsland.</p>
       </Section>
     </>
   );
@@ -211,7 +213,7 @@ function TermsEN() {
         <p><b>Perform</b> and <b>Elite</b> require a free call and your coach’s approval first. <b>Private Personal Advisory</b> is agreed individually.</p>
       </Section>
       <Section title="3. Prices and payment">
-        <p>{prices(false)}. Prices include VAT where the seller is VAT-registered. Payment is taken in advance each month by card via Stripe. The subscription renews automatically every month until cancelled.</p>
+        <p>{prices(false)}. Prices include any applicable VAT. Payment is taken in advance each month by card via Stripe. The subscription renews automatically every month until cancelled.</p>
       </Section>
       <Section title="4. Cancelling and changing plan">
         <p>Cancel any time in the app under Me → Membership → Card, receipts & cancel. Cancellation takes effect at the end of the paid month and you keep access until then. Plan changes are prorated.</p>
@@ -229,7 +231,7 @@ function TermsEN() {
         <p>Price changes are announced at least 30 days in advance so you can cancel in time.</p>
       </Section>
       <Section title="9. Complaints">
-        <p>Contact us first at <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>. You can also complain to the Danish Complaints Board (<a href="https://www.forbrug.dk" target="_blank" rel="noopener">Nævnenes Hus</a>) or via the EU Commission’s complaints portal. Danish law applies.</p>
+        <p>Contact us first at <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>. You can also complain to the Danish Complaints Board (<a href="https://www.forbrug.dk" target="_blank" rel="noopener">Nævnenes Hus</a>) or via the EU Commission’s complaints portal. The agreement is governed by the laws of Wyoming, USA. As a consumer you always keep the protection of the mandatory consumer laws of the country where you live.</p>
       </Section>
     </>
   );

@@ -22,12 +22,14 @@ export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_kQh6ZfmaGeEVd5vt87EtVA_T
 
 /** Business details shown in the privacy policy and terms of sale. */
 export const COMPANY = {
-  name: 'Patrick Simiglai',
-  cvr: '', // TODO Patrick: CVR / company number — decide DK or US company before taking real payments
-  address: '', // TODO Patrick: business address
+  name: 'Simiglai LLC',
+  registration: 'Wyoming LLC · Filing ID 2026-002005371',
+  address: '1309 Coffeen Ave, Suite 1200, Sheridan, Wyoming 82801, USA',
   email: 'ps@patricksimiglai.com',
   web: 'https://app.patricksimiglai.com',
+  /** GDPR art. 27 representative in the EU (required for a non-EU company processing EU clients' health data). Empty = not yet appointed. */
+  euRepresentative: '',
 };
 
 /** Bump when the terms or privacy policy change materially; stored with each client's consent. */
-export const LEGAL_VERSION = '2026-11-19';
+export const LEGAL_VERSION = '2026-11-20';
