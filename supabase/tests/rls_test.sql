@@ -100,6 +100,24 @@ select pg_temp.fails($$insert into public.workouts (title, category) values ('mi
 select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', false);
 select pg_temp.check((select count(*) from public.workouts) = 0, 'client without a plan sees no workouts');
 
+-- ── Waitlist
+reset role; set role anon;
+select set_config('request.jwt.claim.sub', '', false);
+insert into public.waitlist (email, name, source, marketing_consent) values ('Fan@Example.com', 'Fan', 'instagram', true);
+select pg_temp.check((select count(*) from public.waitlist) = 0, 'anonymous can join the waitlist but cannot read it');
+select pg_temp.fails($$insert into public.waitlist (email, marketing_consent) values ('fan@example.com', true)$$, 'same email twice (any case) rejected');
+select pg_temp.fails($$insert into public.waitlist (email, marketing_consent) values ('x@example.com', false)$$, 'joining without marketing consent rejected');
+select pg_temp.fails($$insert into public.waitlist (email, marketing_consent) values ('not-an-email', true)$$, 'invalid email rejected');
+select pg_temp.fails($$select public.on_waitlist('fan@example.com')$$, 'anonymous cannot probe who is on the list');
+reset role; set role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', false);
+select pg_temp.check((select count(*) from public.waitlist) = 0, 'clients cannot read the waitlist');
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-00000000000c', false);
+select pg_temp.check((select count(*) from public.waitlist) = 1, 'coach reads the waitlist');
+reset role;
+select pg_temp.check(public.on_waitlist('FAN@example.com'), 'server-side lookup finds the email (any case)');
+set role authenticated;
+
 -- ── Not signed in
 reset role; set role anon;
 select set_config('request.jwt.claim.sub', '', false);

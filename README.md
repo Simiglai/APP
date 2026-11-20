@@ -71,6 +71,13 @@ Live at **https://app.patricksimiglai.com** (also https://ps-daily.netlify.app; 
 4. ✓ Custom domain app.patricksimiglai.com live with HTTPS.
 5. Create Patrick's own account and set `role = 'coach'`.
 
+## Waitlist & launch offer
+
+- Public page **https://app.patricksimiglai.com/venteliste** (Danish/English). Share with `?ref=instagram`, `?ref=bio`, `?ref=story`, `?ref=friend` to see where sign-ups come from.
+- Sign-ups (name, email, language, source, explicit marketing consent) go to the `waitlist` table — anyone can add themselves, only the coach can read it. Coach dashboard → **Venteliste**: count, sources, list, CSV download, copy all emails, unsubscribe.
+- **Launch offer:** an email on the waitlist gets **7 days free** on its first subscription (`create-checkout` adds a Stripe trial).
+- Share images: `marketing/instagram-post.png` (1080×1080), `marketing/instagram-story.png` (1080×1920), link preview `public/og.png` (1200×630); re-render with `node marketing/render.cjs <out-dir>`.
+
 ## Workout library
 
 Coach dashboard → **Workouts**: add workouts (title, category strength/mobility/recovery, minutes, level, description, video link from YouTube — upload as *Unlisted* — Vimeo or an MP4 URL), hide/publish, and pick the workout of the day for the next 7 days. Days without a pick rotate through the library (Mon strength, Tue mobility, Wed strength, Thu recovery, Fri strength, Sat mobility, Sun recovery). Clients see it in the daily check-in and in the Train tab; “Done ✓” logs it as the day's training. Tables `workouts` and `workout_schedule` (RLS: any active plan can watch published workouts; only the coach edits). Test: `scripts/library_test.cjs`.

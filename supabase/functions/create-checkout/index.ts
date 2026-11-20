@@ -79,6 +79,10 @@ Deno.serve(async (req) => {
       await admin.from('profiles').update({ stripe_customer_id: customer }).eq('id', user.id);
     }
 
+    // Launch offer: people who joined the waitlist get 7 days free on their first subscription.
+    const { data: onList } = await admin.rpc('on_waitlist', { addr: user.email ?? '' });
+    const trial = onList === true && !profile?.stripe_subscription_id;
+
     const session = await stripe('checkout/sessions', {
       mode: 'subscription',
       customer,
@@ -90,6 +94,7 @@ Deno.serve(async (req) => {
       locale: locale === 'da' ? 'da' : 'auto',
       'subscription_data[metadata][user_id]': user.id,
       'subscription_data[metadata][tier]': tier,
+      ...(trial ? { 'subscription_data[trial_period_days]': '7', 'subscription_data[metadata][offer]': 'waitlist-7-days-free' } : {}),
       'subscription_data[metadata][terms_accepted_at]': new Date().toISOString(),
       'subscription_data[metadata][withdrawal_waiver]': 'access starts immediately; 14-day withdrawal right lapses (FAL §18 stk. 2 nr. 13)',
       'custom_text[submit][message]':

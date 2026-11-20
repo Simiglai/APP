@@ -5,6 +5,7 @@ import { StoreProvider, useStore } from './lib/store';
 import { supabase } from './lib/supabase';
 import Auth, { NewPassword } from './screens/Auth';
 import Legal, { PRIVACY_PATH, TERMS_PATH } from './screens/Legal';
+import Waitlist, { WAITLIST_PATH } from './screens/Waitlist';
 import Coach from './screens/Coach';
 import Onboarding from './screens/Onboarding';
 import Today from './screens/Today';
@@ -85,6 +86,7 @@ export default function App() {
   // public pages (no login needed)
   if (location.pathname === PRIVACY_PATH) return <Legal page="privacy" />;
   if (location.pathname === TERMS_PATH) return <Legal page="terms" />;
+  if (location.pathname === WAITLIST_PATH) return <Waitlist />;
   if (session === undefined) return <div className="splash"><div className="spinner" aria-label="Loading" /></div>;
   if (!session) return <main className="app"><Auth /></main>;
   if (recovering) return <main className="app"><NewPassword onDone={() => setRecovering(false)} /></main>;
