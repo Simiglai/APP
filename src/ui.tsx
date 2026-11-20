@@ -2,7 +2,8 @@ import { t } from './i18n';
 import type { ReactNode } from 'react';
 import { formatPrice } from './config';
 import { useStore } from './lib/store';
-import { planFor, type Feature } from './lib/plans';
+import { COMPARISON, PLANS, planCurrency, planFor, priceLabel, type Feature, type Plan } from './lib/plans';
+import type { Currency } from './config';
 
 // `icon` is accepted for readability at call sites but not rendered — the brand look is clean typography.
 export function Card({ title, hint, children, accent }: { title?: string; icon?: string; hint?: string; children: ReactNode; accent?: boolean }) {
@@ -88,7 +89,7 @@ export function Locked({ feature, title, children, onUpgrade }: { feature: Featu
   const { state } = useStore();
   return (
     <section className="card card--accent locked">
-      <span className="tag tag--plan">{plan.name} · {formatPrice(plan.price[state.profile.currency], state.profile.currency)}/{t('mo')}</span>
+      <span className="tag tag--plan">{plan.name} · {priceLabel(plan, state.profile.currency)}</span>
       <h2 className="locked__title">{title}</h2>
       {children && <div className="locked__body">{children}</div>}
       <button className="btn btn--invert" onClick={onUpgrade}>{t('Unlock with {plan}', { plan: plan.name })}</button>
@@ -102,5 +103,62 @@ export function LegalLinks() {
     <p className="muted small center legal-links">
       <a href="/privatliv">{t('Privacy policy')}</a> · <a href="/handelsbetingelser">{t('Terms of sale')}</a>
     </p>
+  );
+}
+
+/** Big plan price: "349 kr./md." or "50.000 kr. / 12 måneder" with "≈ 4.200 kr./md.". */
+export function PlanPrice({ plan, currency }: { plan: Plan; currency: Currency }) {
+  const cur = planCurrency(plan, currency);
+  return (
+    <>
+      <p className="plan__price">
+        {formatPrice(plan.price[cur] as number, cur)}
+        <span>/{plan.billing === '12months' ? t('12 months') : t('month')}</span>
+      </p>
+      {plan.monthlyEquivalent && (
+        <p className="muted small plan__equiv">
+          {t('≈ {price}/month · paid upfront, no automatic renewal', { price: formatPrice(plan.monthlyEquivalent, 'DKK') })}
+        </p>
+      )}
+    </>
+  );
+}
+
+/** Side-by-side comparison of all plans. */
+export function ComparisonTable({ currency }: { currency: Currency }) {
+  return (
+    <div className="compare card">
+      <table>
+        <thead>
+          <tr>
+            <th />
+            {PLANS.map((p) => (
+              <th key={p.id} scope="col">
+                <span className="compare__name">{p.name === 'Accountable' ? 'Account\u00ADable' : p.name}</span>
+                <span className="compare__price">{priceLabel(p, currency)}</span>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {COMPARISON.map((row) => (
+            <tr key={row.label}>
+              <th scope="row">{t(row.label)}</th>
+              {PLANS.map((p) => (
+                <td key={p.id} aria-label={p.features.includes(row.feature) ? t('Included') : t('Not included')}>
+                  {p.features.includes(row.feature) ? <span className="compare__yes">✓</span> : <span className="compare__no">—</span>}
+                </td>
+              ))}
+            </tr>
+          ))}
+          <tr>
+            <th scope="row">{t('Starts with a free call')}</th>
+            {PLANS.map((p) => (
+              <td key={p.id}>{p.id === 'accountable' ? <span className="compare__no">—</span> : <span className="compare__yes">✓</span>}</td>
+            ))}
+          </tr>
+        </tbody>
+      </table>
+    </div>
   );
 }

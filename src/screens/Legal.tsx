@@ -5,8 +5,7 @@
  */
 import type { ReactNode } from 'react';
 import { COACH_NAME, COMPANY, LEGAL_VERSION } from '../config';
-import { PLANS } from '../lib/plans';
-import { formatPrice } from '../config';
+import { PLANS, priceLabel } from '../lib/plans';
 import { getLang } from '../i18n';
 import { BrandLogo } from '../ui';
 
@@ -42,8 +41,8 @@ const Company = () => (
   </p>
 );
 
-const prices = (da: boolean) =>
-  PLANS.map((p) => `${p.name}: ${formatPrice(p.price.DKK, 'DKK')} / ${formatPrice(p.price.USD, 'USD')} ${da ? 'pr. måned' : 'per month'}`).join(' · ');
+const prices = () =>
+  PLANS.map((p) => `${p.name}: ${priceLabel(p, 'DKK')}${p.price.USD !== null ? ` (${priceLabel(p, 'USD')})` : ''}`).join(' · ');
 
 function PrivacyDA() {
   return (
@@ -173,10 +172,11 @@ function TermsDA() {
       </Section>
       <Section title="2. Ydelsen">
         <p>Et månedligt abonnement på coaching-appen {COACH_NAME} med dagligt check-in, accountability med din coach og indhold efter det valgte medlemskab. Medlemskaberne og deres indhold er beskrevet i appen under Medlemskab.</p>
-        <p><b>Perform</b> og <b>Elite</b> kræver en forudgående gratis samtale og godkendelse fra din coach. <b>Privat personlig rådgivning</b> aftales individuelt.</p>
+        <p><b>Perform</b>, <b>Elite</b> og <b>Private</b> kræver en forudgående gratis samtale og godkendelse fra din coach.</p>
+        <p><b>Private</b> er et 12-måneders forløb, der betales forud. Det fornyes ikke automatisk, og I aftaler sammen, om I fortsætter. Det indbetalte beløb refunderes ikke ved ophør før tid, medmindre andet følger af ufravigelig lovgivning. Private-dage, middage og deltagelse i løb aftales løbende med din coach; egne rejse- og startgebyrer betales af dig, medmindre andet aftales.</p>
       </Section>
       <Section title="3. Priser og betaling">
-        <p>{prices(true)}. Priserne er inkl. eventuel moms. Betaling sker forud for hver måned med betalingskort via Stripe. Abonnementet fornyes automatisk hver måned, indtil det opsiges.</p>
+        <p>{prices()}. Priserne er inkl. eventuel moms. Månedlige medlemskaber betales forud for hver måned med betalingskort via Stripe og fornyes automatisk, indtil de opsiges. Private betales forud for 12 måneder.</p>
       </Section>
       <Section title="4. Opsigelse og skift af medlemskab">
         <p>Du kan opsige når som helst i appen under Mig → Medlemskab → Kort, kvitteringer og opsigelse. Opsigelsen gælder fra udgangen af den betalte måned, og du har adgang indtil da. Skifter du medlemskab, reguleres prisen forholdsmæssigt.</p>
@@ -210,10 +210,11 @@ function TermsEN() {
       </Section>
       <Section title="2. The service">
         <p>A monthly subscription to the {COACH_NAME} coaching app with daily check-ins, accountability with your coach and content according to your plan. Plans and their contents are described in the app under Membership.</p>
-        <p><b>Perform</b> and <b>Elite</b> require a free call and your coach’s approval first. <b>Private Personal Advisory</b> is agreed individually.</p>
+        <p><b>Perform</b>, <b>Elite</b> and <b>Private</b> require a free call and your coach’s approval first.</p>
+        <p><b>Private</b> is a 12-month programme paid upfront. It does not renew automatically — you agree together whether to continue. The amount paid is not refunded if you stop early, unless mandatory law says otherwise. Private days, dinners and races are agreed with your coach along the way; your own travel and race entry fees are paid by you unless agreed otherwise.</p>
       </Section>
       <Section title="3. Prices and payment">
-        <p>{prices(false)}. Prices include any applicable VAT. Payment is taken in advance each month by card via Stripe. The subscription renews automatically every month until cancelled.</p>
+        <p>{prices()}. Prices include any applicable VAT. Monthly plans are paid in advance each month by card via Stripe and renew automatically until cancelled. Private is paid upfront for 12 months.</p>
       </Section>
       <Section title="4. Cancelling and changing plan">
         <p>Cancel any time in the app under Me → Membership → Card, receipts & cancel. Cancellation takes effect at the end of the paid month and you keep access until then. Plan changes are prorated.</p>

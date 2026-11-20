@@ -23,7 +23,9 @@ async function stripe(path: string, params?: Record<string, string>, method = pa
   return data;
 }
 
-const TIERS = ['accountable', 'perform', 'elite'];
+const TIERS = ['accountable', 'perform', 'elite', 'private'];
+/** Stripe price lookup keys (Private = 12 months paid upfront, DKK only). */
+const LOOKUP: Record<string, string> = { accountable: 'ps_accountable_monthly', perform: 'ps_perform_monthly', elite: 'ps_elite_monthly', private: 'ps_private_12m' };
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
@@ -35,7 +37,7 @@ Deno.serve(async (req) => {
 
     const { tier, currency, returnUrl, locale, waiver } = await req.json();
     if (!TIERS.includes(tier)) return json({ error: 'Unknown plan.' }, 400);
-    const cur = currency === 'usd' ? 'usd' : 'dkk';
+    const cur = currency === 'usd' && tier !== 'private' ? 'usd' : 'dkk';
     const back = typeof returnUrl === 'string' && /^https?:\/\//.test(returnUrl) ? returnUrl : Deno.env.get('SITE_URL') ?? 'http://localhost:5173';
 
     const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
@@ -50,7 +52,7 @@ Deno.serve(async (req) => {
       return json({ error: 'Book a call first — you can join this plan once your coach has approved you.' }, 403);
     }
 
-    const prices = await stripe('prices', { 'lookup_keys[]': `ps_${tier}_monthly`, active: 'true' }, 'GET');
+    const prices = await stripe('prices', { 'lookup_keys[]': LOOKUP[tier], active: 'true' }, 'GET');
     const price = prices.data?.[0];
     if (!price) return json({ error: 'This plan is not available right now.' }, 500);
 
@@ -81,7 +83,7 @@ Deno.serve(async (req) => {
 
     // Launch offer: people who joined the waitlist get 7 days free on their first subscription.
     const { data: onList } = await admin.rpc('on_waitlist', { addr: user.email ?? '' });
-    const trial = onList === true && !profile?.stripe_subscription_id;
+    const trial = onList === true && !profile?.stripe_subscription_id && tier !== 'private'; // free week is for the monthly plans
 
     const session = await stripe('checkout/sessions', {
       mode: 'subscription',

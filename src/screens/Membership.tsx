@@ -2,9 +2,9 @@ import { getLang, t } from '../i18n';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useStore } from '../lib/store';
 import { PLANS, type Tier } from '../lib/plans';
-import { BOOKING_URL, COACH_NAME, formatPrice, type Currency } from '../config';
+import { BOOKING_URL, COACH_NAME, type Currency } from '../config';
 import { callFunction, supabase } from '../lib/supabase';
-import { LegalLinks } from '../ui';
+import { ComparisonTable, LegalLinks, PlanPrice } from '../ui';
 import { TERMS_PATH } from './Legal';
 
 /**
@@ -90,6 +90,8 @@ export default function Membership({ onBack, gate }: { onBack?: () => void; gate
         </label>
       )}
 
+      <ComparisonTable currency={currency} />
+
       {PLANS.map((p) => {
         const on = p.id === activeTier;
         return (
@@ -98,10 +100,7 @@ export default function Membership({ onBack, gate }: { onBack?: () => void; gate
               <h2>{p.name}</h2>
               {on && <span className="tag tag--challenge">{t("Your plan")}</span>}
             </div>
-            <p className="plan__price">
-              {formatPrice(p.price[currency], currency)}
-              <span>/{t('month')}</span>
-            </p>
+            <PlanPrice plan={p} currency={currency} />
             <p className="muted">{t(p.tagline)}</p>
             <ul className="plan__list">
               {p.bullets.map((b) => (
@@ -136,14 +135,8 @@ export default function Membership({ onBack, gate }: { onBack?: () => void; gate
         </button>
       )}
 
-      <section className="card card--accent plan">
-        <h2 className="locked__title">{t("Private Personal Advisory")}</h2>
-        <p>{t('One-to-one advisory with {coach}. Tailored to you — business, performance and life. By application only.', { coach: COACH_NAME })}</p>
-        <p className="small">{t("Start with a free 30-minute clarification call.")}</p>
-        <a className="btn btn--invert" href={bookingLink} target="_blank" rel="noopener">{t("Book a free call")}</a>
-      </section>
 
-      <p className="muted small center">{t("Secure payments by Stripe. Monthly subscription, cancel any time.")}</p>
+      <p className="muted small center">{t("Secure payments by Stripe. Monthly plans can be cancelled any time.")}</p>
       <LegalLinks />
       {gate && (
         <button className="btn btn--link" onClick={() => supabase.auth.signOut()}>{t("Log out")}</button>

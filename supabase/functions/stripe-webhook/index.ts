@@ -13,7 +13,8 @@ const STATUS: Record<string, string> = {
   incomplete: 'none',
   paused: 'canceled',
 };
-const TIERS = ['accountable', 'perform', 'elite'];
+const TIERS = ['accountable', 'perform', 'elite', 'private'];
+const LOOKUP_TO_TIER: Record<string, string> = { ps_accountable_monthly: 'accountable', ps_perform_monthly: 'perform', ps_elite_monthly: 'elite', ps_private_12m: 'private' };
 
 async function stripeGet(path: string) {
   const res = await fetch(`https://api.stripe.com/v1/${path}`, { headers: { Authorization: `Bearer ${Deno.env.get('STRIPE_SECRET_KEY')}` } });
@@ -48,7 +49,16 @@ Deno.serve(async (req) => {
   if (!userId) return new Response('no matching user');
 
   const lookup: string = sub.items?.data?.[0]?.price?.lookup_key ?? '';
-  const tier = TIERS.find((t) => lookup === `ps_${t}_monthly`) ?? sub.metadata?.tier;
+  const tier = LOOKUP_TO_TIER[lookup] ?? sub.metadata?.tier;
+
+  // Private is a 12-month programme: it must not renew automatically.
+  if (tier === 'private' && ['active', 'trialing'].includes(sub.status) && !sub.cancel_at_period_end) {
+    await fetch(`https://api.stripe.com/v1/subscriptions/${sub.id}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${Deno.env.get('STRIPE_SECRET_KEY')}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ cancel_at_period_end: 'true' }),
+    });
+  }
   const update: Record<string, string> = {
     plan_status: STATUS[sub.status] ?? 'none',
     stripe_customer_id: sub.customer,

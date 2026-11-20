@@ -263,12 +263,12 @@ function ClientDetail({ client, onBack }: { client: ClientRow; onBack: () => voi
 
       <Thread clientId={client.id} coachId={userId} name={client.name} />
 
-      <Card title={t("Approve Perform / Elite")} hint={t("After the call, approve the plan(s) this client may join. They get a message and can then pay in the app.")}>
+      <Card title={t("Approve Perform / Elite / Private")} hint={t("After the call, approve the plan(s) this client may join. They get a message and can then pay in the app.")}>
         {profile?.requested_tier && !profile.approved_tiers.includes(profile.requested_tier) && (
           <p className="call-note">{t('📞 Requested a call for {plan}.', { plan: planById(profile.requested_tier).name })}</p>
         )}
         <div className="chips">
-          {(['perform', 'elite'] as Tier[]).map((tier) => (
+          {(['perform', 'elite', 'private'] as Tier[]).map((tier) => (
             <button key={tier} className={`chip${profile?.approved_tiers.includes(tier) ? ' is-on' : ''}`} onClick={() => toggleApproval(tier)}>
               {profile?.approved_tiers.includes(tier) ? '✓ ' : ''}{planById(tier).name}
             </button>
@@ -392,7 +392,7 @@ function EventsManager() {
 
   return (
     <>
-      <Card title={t("New event")} hint={t("Visible to Elite members in their Mind tab.")}>
+      <Card title={t("New event")} hint={t("Visible to Elite and Private members in their Mind tab.")}>
         <TextField label={t("Title")} value={draft.title} onChange={(title) => setDraft({ ...draft, title })} placeholder={t("Training camp")} />
         <div className="row">
           <label className="field" style={{ flex: 1 }}>

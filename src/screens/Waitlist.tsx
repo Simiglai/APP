@@ -4,10 +4,10 @@
  */
 import { useState, type FormEvent } from 'react';
 import { supabase } from '../lib/supabase';
-import { BOOKING_URL, COACH_NAME, formatPrice } from '../config';
+import { COACH_NAME, formatPrice } from '../config';
 import { PLANS } from '../lib/plans';
 import { getLang, t, useLang } from '../i18n';
-import { LegalLinks } from '../ui';
+import { ComparisonTable, LegalLinks, PlanPrice } from '../ui';
 import { PRIVACY_PATH } from './Legal';
 
 export const WAITLIST_PATH = '/venteliste';
@@ -44,7 +44,7 @@ export default function Waitlist() {
   };
 
   const currency = lang === 'da' ? 'DKK' : 'USD';
-  const from = formatPrice(PLANS[0].price[currency], currency);
+  const from = formatPrice(PLANS[0].price[currency] as number, currency);
 
   return (
     <main className="wl">
@@ -116,6 +116,7 @@ export default function Waitlist() {
       <section className="wl__plans">
         <h2 className="wl__section-title">{t('Choose your level')}</h2>
         <p className="muted">{t('Plans from {price}/month. Cancel any time — and your first week is free when you join the waitlist.', { price: from })}</p>
+        <ComparisonTable currency={currency} />
         {PLANS.map((p) => (
           <article key={p.id} className={`card plan${p.id === 'accountable' ? ' plan--current' : ''}`}>
             <div className="plan__head">
@@ -126,10 +127,7 @@ export default function Waitlist() {
                 <span className="tag tag--mirror">{t('Starts with a call')}</span>
               )}
             </div>
-            <p className="plan__price">
-              {formatPrice(p.price[currency], currency)}
-              <span>/{t('month')}</span>
-            </p>
+            <PlanPrice plan={p} currency={currency} />
             <p className="muted">{t(p.tagline)}</p>
             <ul className="plan__list">
               {p.bullets.map((b) => (
@@ -138,11 +136,6 @@ export default function Waitlist() {
             </ul>
           </article>
         ))}
-        <article className="card card--accent plan">
-          <h2 className="locked__title">{t('Private Personal Advisory')}</h2>
-          <p>{t('One-to-one advisory with {coach}. Tailored to you — business, performance and life. By application only.', { coach: COACH_NAME })}</p>
-          <a className="btn btn--invert" href={BOOKING_URL} target="_blank" rel="noopener">{t('Book a free call')}</a>
-        </article>
         <a className="btn btn--big" href="#join" onClick={(e) => { e.preventDefault(); document.getElementById('join')?.scrollIntoView({ behavior: 'smooth' }); }}>
           {t('Join the waitlist')} ↑
         </a>

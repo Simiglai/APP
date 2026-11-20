@@ -100,6 +100,20 @@ select pg_temp.fails($$insert into public.workouts (title, category) values ('mi
 select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', false);
 select pg_temp.check((select count(*) from public.workouts) = 0, 'client without a plan sees no workouts');
 
+-- ── Private plan (12 months)
+reset role;
+update public.profiles set plan = 'private', plan_status = 'active' where id = '00000000-0000-0000-0000-0000000000b1';
+set role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', false);
+select pg_temp.check(public.has_feature('worksheets') and public.has_feature('events') and public.has_feature('training'), 'private includes worksheets, events and training');
+update public.profiles set requested_tier = 'private' where id = auth.uid();
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-00000000000c', false);
+select public.coach_set_approval('00000000-0000-0000-0000-0000000000b1', '{private}');
+select pg_temp.check((select approved_tiers from public.profiles where id = '00000000-0000-0000-0000-0000000000b1') = '{private}', 'coach can approve private');
+reset role;
+update public.profiles set plan = 'accountable', plan_status = 'none' where id = '00000000-0000-0000-0000-0000000000b1';
+set role authenticated;
+
 -- ── Waitlist
 reset role; set role anon;
 select set_config('request.jwt.claim.sub', '', false);

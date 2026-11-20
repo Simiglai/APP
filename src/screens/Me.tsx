@@ -3,8 +3,7 @@ import { useStore } from '../lib/store';
 import { addDays, todayKey } from '../lib/dates';
 import { Card, LegalLinks, TextField } from '../ui';
 import { callFunction, supabase } from '../lib/supabase';
-import { planById } from '../lib/plans';
-import { formatPrice } from '../config';
+import { planById, priceLabel } from '../lib/plans';
 
 export default function Me({ onWeekly, onGoals, onMembership }: { onWeekly: () => void; onGoals: () => void; onMembership: () => void }) {
   const { state, updateProfile, getDay, streak, activeTier, syncStatus, userId } = useStore();
@@ -51,7 +50,7 @@ export default function Me({ onWeekly, onGoals, onMembership }: { onWeekly: () =
       <button className="card plan-badge" onClick={onMembership}>
         <span>
           <small className="muted">{t("Your membership")}</small>
-          <strong>{activeTier ? `${planById(activeTier).name} · ${formatPrice(planById(activeTier).price[p.currency], p.currency)}/${t('mo')}` : t('No active plan')}</strong>
+          <strong>{activeTier ? `${planById(activeTier).name} · ${priceLabel(planById(activeTier), p.currency)}` : t('No active plan')}</strong>
         </span>
         <span className="edit-link">{t("Manage ›")}</span>
       </button>
