@@ -314,3 +314,5 @@ a.brandbar img { height: 26px; }
 .share-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .share-row code { font-size: 0.78rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hero + .segmented, .hero .segmented { flex-wrap: wrap; }
+.wl__plans { display: flex; flex-direction: column; gap: 12px; }
+.wl__section-title { font-size: 1.5rem; margin-top: 8px; }

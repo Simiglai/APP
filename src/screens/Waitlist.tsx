@@ -4,7 +4,7 @@
  */
 import { useState, type FormEvent } from 'react';
 import { supabase } from '../lib/supabase';
-import { COACH_NAME, formatPrice } from '../config';
+import { BOOKING_URL, COACH_NAME, formatPrice } from '../config';
 import { PLANS } from '../lib/plans';
 import { getLang, t, useLang } from '../i18n';
 import { LegalLinks } from '../ui';
@@ -43,7 +43,8 @@ export default function Waitlist() {
     setError(t('Something went wrong — please try again.'));
   };
 
-  const from = formatPrice(PLANS[0].price.DKK, 'DKK');
+  const currency = lang === 'da' ? 'DKK' : 'USD';
+  const from = formatPrice(PLANS[0].price[currency], currency);
 
   return (
     <main className="wl">
@@ -58,7 +59,7 @@ export default function Waitlist() {
         <div className="wl__offer">🎁 {t('Join the waitlist and get your first week free when we launch.')}</div>
       </section>
 
-      <section className="wl__form card">
+      <section className="wl__form card" id="join">
         {state === 'done' || state === 'already' ? (
           <div className="stack">
             <h2>{state === 'done' ? t('You’re on the list! 🎉') : t('You’re already on the list 👍')}</h2>
@@ -112,14 +113,39 @@ export default function Waitlist() {
         ))}
       </section>
 
-      <section className="wl__plans card">
-        <h2>{t('Plans from {price}/month', { price: from })}</h2>
-        <ul className="plan__list">
-          <li><b>Accountable</b> — {t('daily check-in, workout of the day and your coach in your pocket.')}</li>
-          <li><b>Perform</b> — {t('+ a personal training program in TrainingPeaks.')}</li>
-          <li><b>Elite</b> — {t('+ mental worksheets and events.')}</li>
-        </ul>
-        <p className="muted small">{t('Cancel any time. Your first week is free when you join the waitlist.')}</p>
+      <section className="wl__plans">
+        <h2 className="wl__section-title">{t('Choose your level')}</h2>
+        <p className="muted">{t('Plans from {price}/month. Cancel any time — and your first week is free when you join the waitlist.', { price: from })}</p>
+        {PLANS.map((p) => (
+          <article key={p.id} className={`card plan${p.id === 'accountable' ? ' plan--current' : ''}`}>
+            <div className="plan__head">
+              <h2>{p.name}</h2>
+              {p.id === 'accountable' ? (
+                <span className="tag tag--challenge">{t('Start here')}</span>
+              ) : (
+                <span className="tag tag--mirror">{t('Starts with a call')}</span>
+              )}
+            </div>
+            <p className="plan__price">
+              {formatPrice(p.price[currency], currency)}
+              <span>/{t('month')}</span>
+            </p>
+            <p className="muted">{t(p.tagline)}</p>
+            <ul className="plan__list">
+              {p.bullets.map((b) => (
+                <li key={b}>{t(b)}</li>
+              ))}
+            </ul>
+          </article>
+        ))}
+        <article className="card card--accent plan">
+          <h2 className="locked__title">{t('Private Personal Advisory')}</h2>
+          <p>{t('One-to-one advisory with {coach}. Tailored to you — business, performance and life. By application only.', { coach: COACH_NAME })}</p>
+          <a className="btn btn--invert" href={BOOKING_URL} target="_blank" rel="noopener">{t('Book a free call')}</a>
+        </article>
+        <a className="btn btn--big" href="#join" onClick={(e) => { e.preventDefault(); document.getElementById('join')?.scrollIntoView({ behavior: 'smooth' }); }}>
+          {t('Join the waitlist')} ↑
+        </a>
       </section>
 
       <LegalLinks />

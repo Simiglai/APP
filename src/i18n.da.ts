@@ -562,4 +562,9 @@ export const DA: Record<string, string> = {
   Unsubscribed: 'Afmeldt',
   Unsubscribe: 'Afmeld',
   'Remove {email} from the mailing list?': 'Fjern {email} fra mailinglisten?',
+  // waitlist plans
+  'Choose your level': 'Vælg dit niveau',
+  'Plans from {price}/month. Cancel any time — and your first week is free when you join the waitlist.': 'Medlemskaber fra {price}/md. Opsig når som helst — og din første uge er gratis, når du skriver dig på ventelisten.',
+  'Start here': 'Start her',
+  'Starts with a call': 'Starter med en samtale',
 };
