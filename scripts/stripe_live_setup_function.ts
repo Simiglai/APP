@@ -12,7 +12,9 @@ const PLANS = [
     desc: 'Everything in Accountable + personal training program in TrainingPeaks, built for you. Starts with a call.' },
   { tier: 'elite', name: 'Patrick Simiglai — Elite', dkk: 349900, usd: 50000,
     desc: 'Everything in Perform + mental worksheets and events. Starts with a call.' },
-];
+  { tier: 'private', name: 'Patrick Simiglai — Private', dkk: 5000000, usd: null, interval: 'year', lookup: 'ps_private_12m',
+    desc: '12 months one-to-one with Patrick: everything in Elite + his private phone number, private days (dinners, events, races) and a personal plan. Paid upfront, no automatic renewal. Starts with a call.' },
+] as { tier: string; name: string; dkk: number; usd: number | null; desc: string; interval?: string; lookup?: string }[];
 const EVENTS = ['checkout.session.completed', 'customer.subscription.created', 'customer.subscription.updated', 'customer.subscription.deleted', 'invoice.payment_failed'];
 
 async function stripe(path: string, params?: [string, string][], method = params ? 'POST' : 'GET') {
@@ -38,7 +40,8 @@ Deno.serve(async (req) => {
     const productIds: string[] = [];
     const priceIds: string[] = [];
     for (const p of PLANS) {
-      const existing = await stripe(`prices?lookup_keys[]=ps_${p.tier}_monthly&active=true`);
+      const lookup = p.lookup ?? `ps_${p.tier}_monthly`;
+      const existing = await stripe(`prices?lookup_keys[]=${lookup}&active=true`);
       if (existing.data?.[0]) {
         productIds.push(existing.data[0].product);
         priceIds.push(existing.data[0].id);
@@ -49,12 +52,13 @@ Deno.serve(async (req) => {
         ['name', p.name], ['description', p.desc], ['statement_descriptor', 'PATRICK SIMIGLAI'], ['metadata[tier]', p.tier], ['metadata[app]', 'ps-daily'],
       ]);
       const price = await stripe('prices', [
-        ['product', prod.id], ['currency', 'dkk'], ['unit_amount', String(p.dkk)], ['currency_options[usd][unit_amount]', String(p.usd)],
-        ['recurring[interval]', 'month'], ['lookup_key', `ps_${p.tier}_monthly`], ['metadata[tier]', p.tier],
+        ['product', prod.id], ['currency', 'dkk'], ['unit_amount', String(p.dkk)],
+        ...(p.usd !== null ? [['currency_options[usd][unit_amount]', String(p.usd)] as [string, string]] : []),
+        ['recurring[interval]', p.interval ?? 'month'], ['lookup_key', lookup], ['metadata[tier]', p.tier],
       ]);
       productIds.push(prod.id);
       priceIds.push(price.id);
-      log[p.tier] = { dkk: p.dkk / 100, usd: p.usd / 100, created: true };
+      log[p.tier] = { dkk: p.dkk / 100, usd: p.usd === null ? null : p.usd / 100, created: true };
     }
 
     const hookUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/stripe-webhook`;

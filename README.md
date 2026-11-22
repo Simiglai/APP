@@ -66,7 +66,7 @@ Live at **https://app.patricksimiglai.com** (also https://ps-daily.netlify.app; 
 ### Before launch
 1. ✓ Stripe is LIVE: `STRIPE_SECRET_KEY` in Supabase is the live key; live plans, webhook and billing portal created on 2026-11-19 (see `scripts/stripe_live_setup_function.ts`). The customer portal uses the configuration tagged `metadata.app = ps-daily`.
 2. Do one real purchase with your own card, then refund it in the Stripe dashboard.
-   Seller = the Danish Stripe account (patricksimiglai.com). Add business address + CVR to `COMPANY`; register for VAT when turnover passes 50.000 kr.
+   **Switch to Simiglai LLC's US Stripe account:** put its live secret key in Supabase (`STRIPE_SECRET_KEY`) and re-run `scripts/stripe_live_setup_function.ts` (now incl. Private). EU VAT via non-Union OSS; GDPR art. 27 EU representative.
 3. Supabase sends auth emails via Resend SMTP (noreply@patricksimiglai.com). Remaining: Resend DNS records in Simply → domain verified → turn email confirmation on (`mailer_autoconfirm = false`).
 4. ✓ Custom domain app.patricksimiglai.com live with HTTPS.
 5. Create Patrick's own account and set `role = 'coach'`.
@@ -88,7 +88,7 @@ Danish and English. Danish phones get Danish automatically; clients can switch u
 
 ## Legal & privacy
 
-- **Privacy policy** at `/privatliv` and **terms of sale** at `/handelsbetingelser` (Danish/English, `src/screens/Legal.tsx`) — DRAFTS for Patrick to review. Seller and data controller: **Patrick Simiglai (patricksimiglai.com), Denmark** — the Danish business behind the live Stripe account; `COMPANY` in `src/config.ts` (add address + CVR there); bump `LEGAL_VERSION` on material changes.
+- **Privacy policy** at `/privatliv` and **terms of sale** at `/handelsbetingelser` (Danish/English, `src/screens/Legal.tsx`) — DRAFTS for Patrick to review. Seller and data controller: **Simiglai LLC** (Wyoming, Filing ID 2026-002005371) — `COMPANY` in `src/config.ts`. Payments must go to Simiglai LLC's US Stripe account.; bump `LEGAL_VERSION` on material changes.
 - Sign-up requires accepting terms + privacy and explicit consent to health data (GDPR art. 9); stored as `profiles.consent_version` / `consented_at`.
 - New subscriptions require accepting that access starts immediately so the 14-day withdrawal right lapses; recorded in the Stripe subscription metadata.
 - **Delete my account** (Me): `delete-account` function cancels the Stripe subscription and deletes the user and all their data (invoices stay in Stripe for bookkeeping). Test: `scripts/delete_account_test.py`.

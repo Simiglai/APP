@@ -21,12 +21,12 @@ export const SUPABASE_URL = 'https://olpjikegieacdcqzenvn.supabase.co';
 export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_kQh6ZfmaGeEVd5vt87EtVA_TYdhPlso';
 
 /** Business details shown in the privacy policy and terms of sale. */
-/** Seller + data controller: the Danish business behind the live Stripe account (individual, patricksimiglai.com). */
+/** Seller + data controller: Simiglai LLC (Wyoming), owner Patrick Simiglai. Payments via its US Stripe account. */
 export const COMPANY = {
-  name: 'Patrick Simiglai (patricksimiglai.com)',
-  registration: '', // TODO Patrick: 'CVR: 12345678' once registered
-  address: '', // TODO Patrick: business address in Denmark (required to be shown by Danish e-commerce rules)
-  country: 'Danmark / Denmark',
+  name: 'Simiglai LLC',
+  registration: 'Wyoming LLC · Filing ID 2026-002005371',
+  address: '1309 Coffeen Ave, Suite 1200, Sheridan, Wyoming 82801',
+  country: 'USA',
   email: 'ps@patricksimiglai.com',
   web: 'https://app.patricksimiglai.com',
   /** Only needed for a seller outside the EU (GDPR art. 27). */
@@ -34,4 +34,4 @@ export const COMPANY = {
 };
 
 /** Bump when the terms or privacy policy change materially; stored with each client's consent. */
-export const LEGAL_VERSION = '2026-11-22';
+export const LEGAL_VERSION = '2026-11-22b';
