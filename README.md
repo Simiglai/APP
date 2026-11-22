@@ -66,7 +66,7 @@ Live at **https://app.patricksimiglai.com** (also https://ps-daily.netlify.app; 
 ### Before launch
 1. ✓ Stripe is LIVE: `STRIPE_SECRET_KEY` in Supabase is the live key; live plans, webhook and billing portal created on 2026-11-19 (see `scripts/stripe_live_setup_function.ts`). The customer portal uses the configuration tagged `metadata.app = ps-daily`.
 2. Do one real purchase with your own card, then refund it in the Stripe dashboard.
-   **Simiglai LLC's US Stripe account** is connected in TEST mode (4 plans, webhook, portal; verified 2026-11-22). Going live: put its live secret key in Supabase (`STRIPE_SECRET_KEY`) and re-run `scripts/stripe_live_setup_function.ts`. EU VAT via non-Union OSS; GDPR art. 27 EU representative.
+   ✓ **LIVE on Simiglai LLC's US Stripe account** (2026-11-22): 4 plans, webhook and portal verified; a live checkout session and the portal open. `STRIPE_SECRET_KEY` in Supabase is a restricted live key — replace it with a fresh one (it was shared in chat). EU VAT via non-Union OSS; GDPR art. 27 EU representative.
 3. Supabase sends auth emails via Resend SMTP (noreply@patricksimiglai.com). Remaining: Resend DNS records in Simply → domain verified → turn email confirmation on (`mailer_autoconfirm = false`).
 4. ✓ Custom domain app.patricksimiglai.com live with HTTPS.
 5. Create Patrick's own account and set `role = 'coach'`.
