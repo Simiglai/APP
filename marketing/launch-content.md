@@ -34,7 +34,8 @@ Derfor har jeg bygget min egen coaching-app. Den giver dig et system, der får d
 📲 Hver dag i Team Simiglai:
 🌅 5 minutter om morgenen: formål, top 3 mål, mad, træning og én disciplin-udfordring
 ❓ 2 spørgsmål, der udfordrer dig
-🏋️ Dagens workout med mig på video
+🏋️ Ugentlige workouts med mig på video
+💬 Q&A-chat med mig
 🌙 Aftenevaluering: sejre, læring og en karakter til dagen
 📅 Hver søndag: ugens evaluering
 
@@ -61,7 +62,8 @@ So I built my own coaching app. It gives you a system that makes you show up eve
 📲 Every day in Team Simiglai:
 🌅 5 minutes in the morning: purpose, top 3 goals, food, training and one discipline challenge
 ❓ 2 questions that challenge you
-🏋️ Workout of the day with me on video
+🏋️ Weekly workouts with me on video
+💬 Q&A chat with me
 🌙 Evening review: wins, lessons and a score for the day
 📅 Every Sunday: your weekly review
 
@@ -130,7 +132,7 @@ Tak, fordi du skrev dig på ventelisten. Nu er Team Simiglai åben — og du er 
 **Det får du hver dag:**
 – 5 minutters morgenplan: formål, top 3, mad, træning og én disciplin-udfordring
 – 2 spørgsmål, der udfordrer dig
-– Dagens workout med mig på video
+– Ugentlige workouts med mig på video
 – Aftenevaluering — og jeg ser dine check-ins og følger op
 
 Perform, Elite og Private starter med en gratis samtale med mig, så vi sikrer, at det er det rigtige match.
@@ -158,7 +160,7 @@ Thank you for joining the waitlist. Team Simiglai is now open — and you’re o
 **What you get every day:**
 – A 5-minute morning plan: purpose, top 3, food, training and one discipline challenge
 – 2 questions that challenge you
-– Workout of the day with me on video
+– Weekly workouts with me on video
 – An evening review — and I see your check-ins and follow up
 
 Perform, Elite and Private start with a free call with me to make sure it’s the right fit.

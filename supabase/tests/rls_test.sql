@@ -37,7 +37,7 @@ select pg_temp.fails($$insert into public.days (user_id, date, data) values ('00
 insert into public.messages (client_id, sender_id, body) values (auth.uid(), auth.uid(), 'Check-in done');
 select pg_temp.fails($$insert into public.messages (client_id, sender_id, body) values ('00000000-0000-0000-0000-0000000000e1', auth.uid(), 'hi')$$, 'anna cannot post in erik''s thread');
 select pg_temp.fails($$insert into public.worksheets (user_id, worksheet_id, data) values (auth.uid(), 'fear-setting', '{}')$$, 'anna (accountable) cannot use worksheets');
-select pg_temp.check((select count(*) from public.events) = 0, 'anna (accountable) cannot see events');
+select pg_temp.check((select count(*) from public.events) = 1, 'anna (accountable) sees events (buy-in)');
 select pg_temp.check((select count(*) from public.training_programs) = 0, 'anna (accountable) has no training program access');
 
 -- ── Erik (Elite client)

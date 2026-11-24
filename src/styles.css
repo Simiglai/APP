@@ -328,6 +328,7 @@ a.brandbar img { height: 26px; }
 .compare__price { display: block; font-weight: 300; color: var(--muted); font-size: 0.68rem; line-height: 1.2; margin-top: 2px; }
 .compare__yes { color: var(--ok); font-weight: 800; font-size: 1rem; }
 .compare__no { color: var(--line); }
+.compare__txt { display: block; font-size: .6rem; font-weight: 700; line-height: 1.15; color: var(--heading); overflow-wrap: normal; word-break: normal; }
 .plan__equiv { margin-top: -6px; }
 /* comparison: all four plans must fit on a phone without sideways scrolling */
 .compare { overflow-x: visible; padding: 6px 2px; }

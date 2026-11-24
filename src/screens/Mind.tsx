@@ -48,7 +48,7 @@ export default function Mind({ onUpgrade }: { onUpgrade: () => void }) {
         </Locked>
       )}
 
-      {hasFeature(tier, 'events') ? <Events /> : (
+      {hasFeature(tier, 'events') ? <Events included={hasFeature(tier, 'eventsincluded')} /> : (
         <Locked feature="events" title={t("Events")} onUpgrade={onUpgrade}>
           <p>{t('Training camps, workshops and meet-ups with {coach} and the community.', { coach: COACH_NAME })}</p>
         </Locked>
@@ -57,11 +57,12 @@ export default function Mind({ onUpgrade }: { onUpgrade: () => void }) {
   );
 }
 
-function Events() {
+function Events({ included }: { included: boolean }) {
   const { state, toggleRsvp } = useStore();
   const upcoming = state.events.filter((e) => e.date >= new Date().toISOString().slice(0, 10)).sort((a, b) => a.date.localeCompare(b.date));
   return (
     <Card title={t("Events")} hint={t("Train together. Grow together.")}>
+      <p className="muted small">{included ? t('Events are included in your plan.') : t('Events are a buy-in on your plan — the price is shown on each event.')}</p>
       {upcoming.length === 0 && <p className="empty">{t("No upcoming events yet — new events will appear here.")}</p>}
       {upcoming.map((e) => {
         const going = state.rsvps.includes(e.id);

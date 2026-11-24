@@ -392,7 +392,7 @@ function EventsManager() {
 
   return (
     <>
-      <Card title={t("New event")} hint={t("Visible to Elite and Private members in their Mind tab.")}>
+      <Card title={t("New event")} hint={t("Visible to all members in their Mind tab — included for Elite and Private, buy-in for Accountable and Perform.")}>
         <TextField label={t("Title")} value={draft.title} onChange={(title) => setDraft({ ...draft, title })} placeholder={t("Training camp")} />
         <div className="row">
           <label className="field" style={{ flex: 1 }}>

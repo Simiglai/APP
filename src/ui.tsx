@@ -144,19 +144,16 @@ export function ComparisonTable({ currency }: { currency: Currency }) {
           {COMPARISON.map((row) => (
             <tr key={row.label}>
               <th scope="row">{t(row.label)}</th>
-              {PLANS.map((p) => (
-                <td key={p.id} aria-label={p.features.includes(row.feature) ? t('Included') : t('Not included')}>
-                  {p.features.includes(row.feature) ? <span className="compare__yes">✓</span> : <span className="compare__no">—</span>}
-                </td>
-              ))}
+              {PLANS.map((p) => {
+                const c = row.cells[p.id];
+                return (
+                  <td key={p.id} aria-label={c === true ? t('Included') : c === false ? t('Not included') : t(c)}>
+                    {c === true ? <span className="compare__yes">✓</span> : c === false ? <span className="compare__no">—</span> : <span className="compare__txt">{t(c)}</span>}
+                  </td>
+                );
+              })}
             </tr>
           ))}
-          <tr>
-            <th scope="row">{t('Starts with a free call')}</th>
-            {PLANS.map((p) => (
-              <td key={p.id}>{p.id === 'accountable' ? <span className="compare__no">—</span> : <span className="compare__yes">✓</span>}</td>
-            ))}
-          </tr>
         </tbody>
       </table>
     </div>
