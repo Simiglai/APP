@@ -589,4 +589,10 @@ export const DA: Record<string, string> = {
   'Approve Perform / Elite / Private': 'Godkend Perform / Elite / Private',
   'Visible to Elite and Private members in their Mind tab.': 'Synligt for Elite- og Private-medlemmer under Mind.',
   'Secure payments by Stripe. Monthly plans can be cancelled any time.': 'Sikker betaling via Stripe. Månedlige medlemskaber kan opsiges når som helst.',
+  // email confirmation
+  'Check your email 📬': 'Tjek din e-mail 📬',
+  'We sent a confirmation link to {email}. Tap it to activate your account — then you’re in.': 'Vi har sendt et bekræftelseslink til {email}. Tryk på det for at aktivere din konto, så er du inde.',
+  'Can’t find it? Check your spam folder.': 'Kan du ikke finde den? Tjek din spam-mappe.',
+  'I’ve confirmed — log in': 'Jeg har bekræftet, log ind',
+  'Please confirm your email first — check your inbox.': 'Bekræft din e-mail først. Tjek din indbakke.',
 };

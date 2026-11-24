@@ -8,6 +8,7 @@ import { BrandLogo, LegalLinks } from '../ui';
 export default function Auth() {
   const [mode, setMode] = useState<'signin' | 'signup' | 'reset'>('signup');
   const [sent, setSent] = useState(false);
+  const [confirm, setConfirm] = useState(false);
   const [consent, setConsent] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -19,16 +20,40 @@ export default function Auth() {
     e.preventDefault();
     setBusy(true);
     setError('');
+    if (mode === 'signup') {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: location.origin,
+          data: { name: name.trim(), language: getLang(), currency: defaultCurrency(), consent_version: LEGAL_VERSION },
+        },
+      });
+      setBusy(false);
+      if (error) return setError(friendly(error.message));
+      if (!data.session) setConfirm(true); // email confirmation required: no session until the link is clicked
+      return;
+    }
     const { error } =
-      mode === 'signup'
-        ? await supabase.auth.signUp({ email, password, options: { data: { name: name.trim(), language: getLang(), currency: defaultCurrency(), consent_version: LEGAL_VERSION } } })
-        : mode === 'reset'
-          ? await supabase.auth.resetPasswordForEmail(email, { redirectTo: location.origin })
-          : await supabase.auth.signInWithPassword({ email, password });
+      mode === 'reset'
+        ? await supabase.auth.resetPasswordForEmail(email, { redirectTo: location.origin })
+        : await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
     if (error) setError(friendly(error.message));
     else if (mode === 'reset') setSent(true);
   };
+
+  if (confirm) {
+    return (
+      <div className="onboard auth">
+        <BrandLogo variant="logo" className="onboard__logo" />
+        <h1>{t('Check your email 📬')}</h1>
+        <p className="muted">{t('We sent a confirmation link to {email}. Tap it to activate your account — then you’re in.', { email })}</p>
+        <p className="muted small">{t('Can’t find it? Check your spam folder.')}</p>
+        <button className="btn btn--link" onClick={() => { setConfirm(false); setMode('signin'); }}>{t('I’ve confirmed — log in')}</button>
+      </div>
+    );
+  }
 
   return (
     <div className="onboard auth">
@@ -96,6 +121,7 @@ export default function Auth() {
 
 const friendly = (msg: string) => {
   if (/invalid login/i.test(msg)) return t("Wrong email or password.");
+  if (/not confirmed/i.test(msg)) return t('Please confirm your email first — check your inbox.');
   if (/already registered/i.test(msg)) return t("That email already has an account — log in instead.");
   if (/password/i.test(msg) && /characters/i.test(msg)) return t("Password must be at least 8 characters.");
   return msg;
