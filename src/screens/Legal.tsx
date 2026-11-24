@@ -41,7 +41,7 @@ const Company = () => (
     {COMPANY.euRepresentative && (
       <>
         <br />
-        EU representative (GDPR art. 27): {COMPANY.euRepresentative}
+        {getLang() === 'da' ? 'Repræsentant i EU (GDPR art. 27)' : 'Representative in the EU (GDPR art. 27)'}: {COMPANY.euRepresentative}
       </>
     )}
   </p>

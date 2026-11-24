@@ -22,7 +22,7 @@ Simiglai LLC er en amerikansk virksomhed. GDPR art. 27 kræver en **EU-repræsen
 - **Hvis du driver virksomheden fra Danmark** (du bor og arbejder her), er LLC’et efter al sandsynlighed *etableret i EU* via dig → så gælder GDPR fuldt ud med **Datatilsynet** som tilsyn, og der er normalt **ikke** brug for en EU-repræsentant.
 - **Hvis ikke**, skal du udpege en EU-repræsentant skriftligt (tjenester som fx Prighter, DataRep eller VeraSafe — ca. 100–300 € om året) og skrive den i privatlivspolitikken.
 
-👉 **Spørg din revisor/advokat: “Er Simiglai LLC etableret i EU, når jeg driver den fra Danmark?”** Svaret afgør, om du skal have en repræsentant.
+✅ **Valgt:** Patrick Simiglai (bosat i Danmark) er udpeget som Simiglai LLC’s repræsentant i EU. Underskriv udpegelsen i `docs/eu-representative.md`, og gem den.
 
 ### b) Databehandleraftaler (DPA) med leverandørerne
 Du skal have en databehandleraftale med alle, der behandler klientdata for dig. De fleste har en standardaftale, du accepterer:
@@ -44,7 +44,7 @@ Hvis klientdata kommer i forkerte hænder: **anmeld til Datatilsynet inden 72 ti
 | | |
 |---|---|
 | **Dataansvarlig** | Simiglai LLC, 1309 Coffeen Ave, Suite 1200, Sheridan, WY 82801, USA · ps@patricksimiglai.com · kontaktperson: Patrick Simiglai |
-| **EU-repræsentant** | *(udfyldes, hvis relevant — se 2a)* |
+| **EU-repræsentant** | Patrick Simiglai, Danmark · ps@patricksimiglai.com *(udpeget skriftligt — se `docs/eu-representative.md`; tilføj dansk adresse)* |
 
 | Behandling | Formål | Kategorier af data | Registrerede | Retsgrundlag | Modtagere / databehandlere | Opbevaring |
 |---|---|---|---|---|---|---|

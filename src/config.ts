@@ -29,8 +29,8 @@ export const COMPANY = {
   country: 'USA',
   email: 'ps@patricksimiglai.com',
   web: 'https://app.patricksimiglai.com',
-  /** Only needed for a seller outside the EU (GDPR art. 27). */
-  euRepresentative: '',
+  /** GDPR art. 27 representative in the EU (designated in writing — see docs/eu-representative.md). TODO: add Danish address. */
+  euRepresentative: 'Patrick Simiglai, Danmark · ps@patricksimiglai.com',
 };
 
 /** Bump when the terms or privacy policy change materially; stored with each client's consent. */
