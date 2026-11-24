@@ -38,7 +38,7 @@ Derfor har jeg bygget min egen coaching-app. Den giver dig et system, der får d
 🌙 Aftenevaluering: sejre, læring og en karakter til dagen
 📅 Hver søndag: ugens evaluering
 
-Det kan du forvente af mig: Jeg ser dine check-ins, jeg følger op, når du falder fra, og jeg fejrer dine sejre.
+Det kan du forvente af mig: Jeg ser dine check-ins, jeg følger op, når du falder fra, og jeg fejrer dine sejre, store og små.
 Det forventer jeg af dig: At du møder op. Hver dag.
 
 4 niveauer — fra 349 kr./md. til 12 måneder én-til-én med mig.
