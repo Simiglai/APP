@@ -182,7 +182,7 @@ function TermsDA() {
         <p><b>Private</b> er et 12-måneders forløb, der betales forud. Det fornyes ikke automatisk, og I aftaler sammen, om I fortsætter. Det indbetalte beløb refunderes ikke ved ophør før tid, medmindre andet følger af ufravigelig lovgivning. Private-dage, middage og deltagelse i løb aftales løbende med din coach; egne rejse- og startgebyrer betales af dig, medmindre andet aftales.</p>
       </Section>
       <Section title="3. Priser og betaling">
-        <p>{prices()}. Priserne er inkl. eventuel moms. Månedlige medlemskaber betales forud for hver måned med betalingskort via Stripe og fornyes automatisk, indtil de opsiges. Private betales forud for 12 måneder.</p>
+        <p>{prices()}. Alle priser er inkl. moms. Månedlige medlemskaber betales forud for hver måned med betalingskort via Stripe og fornyes automatisk, indtil de opsiges. Private betales forud for 12 måneder.</p>
       </Section>
       <Section title="4. Opsigelse og skift af medlemskab">
         <p>Du kan opsige når som helst i appen under Mig → Medlemskab → Kort, kvitteringer og opsigelse. Opsigelsen gælder fra udgangen af den betalte måned, og du har adgang indtil da. Skifter du medlemskab, reguleres prisen forholdsmæssigt.</p>
@@ -220,7 +220,7 @@ function TermsEN() {
         <p><b>Private</b> is a 12-month programme paid upfront. It does not renew automatically — you agree together whether to continue. The amount paid is not refunded if you stop early, unless mandatory law says otherwise. Private days, dinners and races are agreed with your coach along the way; your own travel and race entry fees are paid by you unless agreed otherwise.</p>
       </Section>
       <Section title="3. Prices and payment">
-        <p>{prices()}. Prices include any applicable VAT. Monthly plans are paid in advance each month by card via Stripe and renew automatically until cancelled. Private is paid upfront for 12 months.</p>
+        <p>{prices()}. All prices include VAT. Monthly plans are paid in advance each month by card via Stripe and renew automatically until cancelled. Private is paid upfront for 12 months.</p>
       </Section>
       <Section title="4. Cancelling and changing plan">
         <p>Cancel any time in the app under Me → Membership → Card, receipts & cancel. Cancellation takes effect at the end of the paid month and you keep access until then. Plan changes are prorated.</p>
