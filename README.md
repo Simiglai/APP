@@ -78,6 +78,20 @@ Live at **https://app.patricksimiglai.com** (also https://ps-daily.netlify.app; 
 - **Launch offer:** an email on the waitlist gets **7 days free** on its first subscription (`create-checkout` adds a Stripe trial).
 - Share images: `marketing/instagram-post.png` (1080×1080), `marketing/instagram-story.png` (1080×1920), link preview `public/og.png` (1200×630); re-render with `node marketing/render.cjs <out-dir>`.
 
+## Health & nutrition agent
+
+Coach dashboard → **My health** (Patrick's own account for now). Code: `src/screens/Health.tsx`, `src/lib/appleHealth.ts`, `supabase/functions/health-agent/`, migration `20261124000000_health_agent.sql`.
+
+- **Log**: meals by photo or description. Claude estimates kcal / protein / carbs / fat / fiber, and you check the numbers before saving. Body metrics per day (weight, waist, body fat, sleep, resting HR, HRV, steps, active kcal, energy, notes). Today's totals are shown against your targets.
+- **Trends**: 30/90-day charts for weight, calories, protein, sleep, resting HR, HRV, steps and waist.
+- **Ask the agent**: questions in plain language, plus a **Weekly analysis**. The agent (Claude Opus 5.5 via the Anthropic API, tool use) reads your metrics, meals, daily check-ins, goals, targets and computed trends, then answers with your own numbers. Answers are saved in `health_reports` and the last 4 are used as memory.
+- **Setup**: nutrition targets, goal weight, "about you" context, and **Apple Health import** (export.xml, last 12 months: steps, active energy, sleep, resting HR, HRV, weight, body fat). The file is parsed in the browser and merged by `health_import()`, so manual values are never wiped.
+- **Privacy**: every `health_*` table and the private `meal-photos` bucket can only be read by its owner. The coach can't see clients' health data. The function reads data with the caller's own session, so RLS applies to the agent too.
+- **Setup steps**: apply the migration, deploy the `health-agent` function, and set the Supabase secret `ANTHROPIC_API_KEY`.
+- **Opening it to clients later (Perform/Elite/Private)**: set the secret `HEALTH_AGENT_FOR_CLIENTS=true`, add a client tab that renders `<Health userId=… />`, and add Anthropic as a sub-processor in the privacy policy (bump `LEGAL_VERSION`). Also delete a client's meal photos when their account is deleted.
+- Tests: `supabase/tests/health_test.sql` (run after the migrations, like `rls_test.sql`).
+- Next: Garmin / Oura / Whoop sync. Until then their apps can write into Apple Health.
+
 ## Workout library
 
 Coach dashboard → **Workouts**: add workouts (title, category strength/mobility/recovery, minutes, level, description, video link from YouTube — upload as *Unlisted* — Vimeo or an MP4 URL), hide/publish, and pick the workout of the day for the next 7 days. Days without a pick rotate through the library (Mon strength, Tue mobility, Wed strength, Thu recovery, Fri strength, Sat mobility, Sun recovery). Clients see it in the daily check-in and in the Train tab; “Done ✓” logs it as the day's training. Tables `workouts` and `workout_schedule` (RLS: any active plan can watch published workouts; only the coach edits). Test: `scripts/library_test.cjs`.

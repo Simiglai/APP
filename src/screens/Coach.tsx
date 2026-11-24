@@ -9,6 +9,7 @@ import type { DayEntry, WeekReview } from '../lib/types';
 import { BrandLogo, Card, TextField } from '../ui';
 import CoachWorkouts from './CoachWorkouts';
 import CoachWaitlist from './CoachWaitlist';
+import Health from './Health';
 
 type ClientRow = {
   id: string;
@@ -47,7 +48,8 @@ const flags = (c: ClientRow) => {
 export default function Coach() {
   const [clients, setClients] = useState<ClientRow[] | null>(null);
   const [open, setOpen] = useState<ClientRow | null>(null);
-  const [tab, setTab] = useState<'clients' | 'workouts' | 'events' | 'waitlist'>('clients');
+  const [tab, setTab] = useState<'clients' | 'workouts' | 'events' | 'waitlist' | 'health'>('clients');
+  const { userId } = useStore();
 
   const load = useCallback(async () => {
     const { data } = await supabase.from('coach_client_overview').select('*');
@@ -91,10 +93,13 @@ export default function Coach() {
             <button className={tab === 'workouts' ? 'is-on' : ''} onClick={() => setTab('workouts')}>{t('Workouts')}</button>
             <button className={tab === 'events' ? 'is-on' : ''} onClick={() => setTab('events')}>{t('Events')}</button>
             <button className={tab === 'waitlist' ? 'is-on' : ''} onClick={() => setTab('waitlist')}>{t('Waitlist')}</button>
+            <button className={tab === 'health' ? 'is-on' : ''} onClick={() => setTab('health')}>{t('My health')}</button>
           </div>
         </header>
 
-        {tab === 'waitlist' ? (
+        {tab === 'health' ? (
+          <Health userId={userId} />
+        ) : tab === 'waitlist' ? (
           <CoachWaitlist />
         ) : tab === 'workouts' ? (
           <CoachWorkouts />
