@@ -29,7 +29,7 @@ I lang tid har jeg set det samme mønster: Vi starter med fuld fart — og efter
 
 Motivation forsvinder. Systemer består.
 
-Derfor har jeg bygget min egen coaching-app. Den giver dig et system, der får dig til at møde op hver dag — og en coach, der holder dig op på det. Mig.
+Derfor har jeg bygget min egen coaching-app. Den giver dig et system, der får dig til at møde op hver dag — og en personlig rådgiver, der holder dig op på det. Mig.
 
 📲 Hver dag i Team Simiglai:
 🌅 5 minutter om morgenen: formål, top 3 mål, mad, træning og én disciplin-udfordring
