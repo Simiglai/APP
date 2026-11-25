@@ -71,7 +71,7 @@ Daglig accountability, udfordrende spørgsmål, ugentlige workouts med mig, Q&A-
 Alt i Accountable + personligt træningsprogram i TrainingPeaks, opfølgning flere gange om ugen og 30 min. 1:1 med mig hver måned. Mulighed for tilkøb af events.
 
 🟦 **Elite**, 3.499 kr./md.
-Alt i Perform + 1 times 1:1-session, mentale øvelser og events inkluderet. Opkald med mig samme dag, når du har brug for det, og mulighed for at deltage i et løb.
+Alt i Perform + 1 times 1:1 med mig hver måned (eller 2 × 30 min.), mentale øvelser og events inkluderet. Opkald med mig samme dag, når du har brug for det, og mulighed for at deltage i et løb.
 
 🟦 **Private**, 50.000 kr. for 12 måneder (≈ 4.200 kr./md.)
 Alt i Elite + private dage i mit gym og hjem. Ring til mig, når du har brug for det, ubegrænset adgang. Invitationer til velgørenhedsmiddage og netværk, min private inner circle-gruppe, og tag med mig til et løb i USA + træningslejr.
@@ -94,7 +94,7 @@ Daily accountability, challenging questions, weekly workouts with me, Q&A chat w
 Everything in Accountable + a personal training program in TrainingPeaks, follow-up several times a week and 30 min 1:1 with me every month. Buy-in access to events.
 
 🟦 **Elite**, $500/month
-Everything in Perform + a 1-hour 1:1 session, mental exercises and events included. A same-day call with me when you need it, and the option to join a race.
+Everything in Perform + 1 hour 1:1 with me every month (or 2 × 30 min), mental exercises and events included. A same-day call with me when you need it, and the option to join a race.
 
 🟦 **Private**, 50,000 DKK for 12 months (≈ 4,200 DKK/month)
 Everything in Elite + private days in my gym and home. Call me whenever you need, unlimited access. Invites to charity dinners and networks, my private inner circle group, and join me on a race in the US + training camp.

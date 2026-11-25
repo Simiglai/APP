@@ -61,7 +61,7 @@ export const PLANS: Plan[] = [
     features: ['checkin', 'coach', 'weekly', 'goals', 'library', 'events', 'training', 'trainingpeaks', 'worksheets', 'eventsincluded', 'samedaycall', 'race'],
     bullets: [
       'Everything in Perform',
-      '1-hour 1:1 session with Patrick',
+      '1 hour 1:1 with Patrick every month (or 2 × 30 min)',
       'Mental exercises & mindset work',
       'Events included',
       'Same-day call with Patrick when needed',
@@ -114,7 +114,7 @@ export const COMPARISON: { label: string; cells: Record<Tier, Cell> }[] = [
   { label: 'Events', cells: { accountable: 'Buy-in', perform: 'Buy-in', elite: 'Incl.', private: 'Incl.' } },
   { label: 'Training program in TrainingPeaks', cells: { accountable: false, perform: true, elite: true, private: true } },
   { label: 'Follow-up several times a week', cells: { accountable: false, perform: true, elite: true, private: true } },
-  { label: '1:1 with Patrick', cells: { accountable: false, perform: '30 min /mo', elite: '1 hour', private: 'Always' } },
+  { label: '1:1 with Patrick', cells: { accountable: false, perform: '30 min /mo', elite: '1 h /mo', private: 'Always' } },
   { label: 'Mental exercises', cells: { accountable: false, perform: false, elite: true, private: true } },
   { label: 'Same-day call when needed', cells: { accountable: false, perform: false, elite: true, private: true } },
   { label: 'Join a race', cells: { accountable: false, perform: false, elite: 'Option', private: 'US + camp' } },
