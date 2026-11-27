@@ -83,6 +83,8 @@ Live at **https://app.patricksimiglai.com** (also https://ps-daily.netlify.app; 
 Coach dashboard → **My health** (Patrick's own account for now). Code: `src/screens/Health.tsx`, `src/lib/appleHealth.ts`, `supabase/functions/health-agent/`, migration `20261124000000_health_agent.sql`.
 
 - **Log**: meals by photo or description. Claude estimates kcal / protein / carbs / fat / fiber, and you check the numbers before saving. Body metrics per day (weight, waist, body fat, sleep, resting HR, HRV, steps, active kcal, energy, notes). Today's totals are shown against your targets.
+- **Supplements** (Tilskud): the daily plan grouped by time slot (morning with fat, pre-run, lunch, iron alone, evening), with timing rules, a tick-off checklist per day and a 7-day overview. Edit list: add, rename, move, pause or remove. Tables `health_supplements` and `health_supplement_log`; the agent reads them with `get_supplements`.
+- **Saved meals**: "Save as favourite" on a meal you have entered, then one tap logs it again (`health_saved_meals`).
 - **Trends**: 30/90-day charts for weight, calories, protein, sleep, resting HR, HRV, steps and waist.
 - **Ask the agent**: questions in plain language, plus a **Weekly analysis**. The agent (Claude Opus 5.5 via the Anthropic API, tool use) reads your metrics, meals, daily check-ins, goals, targets and computed trends, then answers with your own numbers. Answers are saved in `health_reports` and the last 4 are used as memory.
 - **Setup**: nutrition targets, goal weight, "about you" context, and **Apple Health import** (export.xml, last 12 months: steps, active energy, sleep, resting HR, HRV, weight, body fat). The file is parsed in the browser and merged by `health_import()`, so manual values are never wiped.

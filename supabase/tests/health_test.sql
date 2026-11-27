@@ -42,3 +42,15 @@ select set_config('request.jwt.claim.sub', '22222222-2222-2222-2222-222222222222
 do $$ begin assert (select count(*) from health_saved_meals) = 0, 'saved meals leaked'; end $$;
 reset role;
 select 'saved meals tests passed' as result;
+-- supplements are private too
+set role authenticated;
+select set_config('request.jwt.claim.sub', '11111111-1111-1111-1111-111111111111', false);
+insert into health_supplements (user_id, slot, name) values (auth.uid(), 'morning', 'D3');
+insert into health_supplement_log (user_id, date, supplement_id) select auth.uid(), '2026-11-28', id from health_supplements;
+select set_config('request.jwt.claim.sub', '22222222-2222-2222-2222-222222222222', false);
+do $$ begin
+  assert (select count(*) from health_supplements) = 0, 'supplements leaked';
+  assert (select count(*) from health_supplement_log) = 0, 'supplement log leaked';
+end $$;
+reset role;
+select 'supplement tests passed' as result;

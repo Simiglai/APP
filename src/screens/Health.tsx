@@ -4,6 +4,7 @@ import { callFunction, supabase } from '../lib/supabase';
 import { addDays, prettyDate, todayKey } from '../lib/dates';
 import { importAppleHealth } from '../lib/appleHealth';
 import { Card, Progress, Scale, TextField } from '../ui';
+import Supplements from './Supplements';
 
 /** Personal health & nutrition agent: log body metrics and meals, import Apple Health, ask Claude to analyse it all. */
 
@@ -44,7 +45,7 @@ const guessMeal = (): MealType => {
 const errText = (e: unknown) => (e instanceof Error ? t(e.message) : t('Something went wrong — please try again.'));
 
 export default function Health({ userId }: { userId: string }) {
-  const [tab, setTab] = useState<'today' | 'trends' | 'agent' | 'setup'>('today');
+  const [tab, setTab] = useState<'today' | 'supps' | 'trends' | 'agent' | 'setup'>('today');
   const [settings, setSettings] = useState<Settings>(emptySettings);
 
   useEffect(() => {
@@ -54,13 +55,14 @@ export default function Health({ userId }: { userId: string }) {
   return (
     <>
       <div className="segmented">
-        {(['today', 'trends', 'agent', 'setup'] as const).map((id) => (
+        {(['today', 'supps', 'trends', 'agent', 'setup'] as const).map((id) => (
           <button key={id} className={tab === id ? 'is-on' : ''} onClick={() => setTab(id)}>
-            {t({ today: 'Log', trends: 'Trends', agent: 'Ask the agent', setup: 'Setup' }[id])}
+            {t({ today: 'Log', supps: 'Supplements', trends: 'Trends', agent: 'Ask the agent', setup: 'Setup' }[id])}
           </button>
         ))}
       </div>
       {tab === 'today' && <LogTab userId={userId} settings={settings} />}
+      {tab === 'supps' && <Supplements userId={userId} />}
       {tab === 'trends' && <TrendsTab userId={userId} settings={settings} />}
       {tab === 'agent' && <AgentTab userId={userId} />}
       {tab === 'setup' && <SetupTab userId={userId} settings={settings} onSaved={setSettings} />}

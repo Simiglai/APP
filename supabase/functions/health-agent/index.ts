@@ -45,6 +45,7 @@ const TOOLS: Anthropic.Beta.BetaTool[] = [
   { name: 'get_meals', description: 'Logged meals with time, type, description and kcal / protein / carbs / fat / fiber (some estimated by AI from photos), plus per-day totals.', input_schema: RANGE },
   { name: 'get_checkins', description: 'Daily check-ins from the planner: sleep hours, mood (1-5), energy (1-5), water glasses, planned meals, training done + notes, day rating (1-10), wins and lessons.', input_schema: RANGE },
   { name: 'get_trends', description: 'Pre-computed statistics per metric over a range: count, average, min, max, first/last value, and the linear trend per week. Use this for "is X going up/down" questions instead of eyeballing raw rows.', input_schema: RANGE },
+  { name: 'get_supplements', description: 'The user’s supplement plan (name, dose, time slot, note, paused or not) and which supplements were ticked off as taken on each day in the range, with adherence per day. Slots: morning (with fatty breakfast), prerun (30-60 min before activity), lunch (with food), afternoon (iron, alone), evening (before bed).', input_schema: RANGE },
   { name: 'get_goals', description: 'Long-term goals (with area, why, target date, milestones) and the nutrition targets + personal context the user set.', input_schema: { type: 'object', properties: {}, required: [], additionalProperties: false } },
 ];
 
@@ -115,6 +116,23 @@ async function getGoals(db: SupabaseClient, uid: string) {
   return { goals: (goals ?? []).map((g: { data: Row }) => g.data), nutrition_targets_and_context: settings ?? 'not set' };
 }
 
+async function getSupplements(db: SupabaseClient, uid: string, from: string, to: string) {
+  const [{ data: plan, error }, { data: log }] = await Promise.all([
+    db.from('health_supplements').select('id, slot, name, dose, note, active').eq('user_id', uid).order('slot').order('sort'),
+    db.from('health_supplement_log').select('date, supplement_id').eq('user_id', uid).gte('date', from).lte('date', to).order('date'),
+  ]);
+  if (error) throw error;
+  const names = Object.fromEntries((plan ?? []).map((p: Row) => [p.id, p.name]));
+  const activeCount = (plan ?? []).filter((p: Row) => p.active).length;
+  const byDay: Record<string, string[]> = {};
+  for (const l of log ?? []) (byDay[l.date] ??= []).push(String(names[l.supplement_id] ?? '?'));
+  return {
+    plan: (plan ?? []).map(({ id: _id, ...p }: Row) => p),
+    taken_by_day: Object.entries(byDay).map(([date, taken]) => ({ date, taken, adherence: activeCount ? `${taken.length}/${activeCount}` : null })),
+    note: 'Days missing from taken_by_day had nothing ticked off — the user may simply not have logged.',
+  };
+}
+
 async function runTool(db: SupabaseClient, uid: string, name: string, input: { from?: string; to?: string }) {
   const { from, to } = clampRange(input?.from, input?.to);
   switch (name) {
@@ -122,18 +140,20 @@ async function runTool(db: SupabaseClient, uid: string, name: string, input: { f
     case 'get_meals': return getMeals(db, uid, from, to);
     case 'get_checkins': return getCheckins(db, uid, from, to);
     case 'get_trends': return getTrends(db, uid, from, to);
+    case 'get_supplements': return getSupplements(db, uid, from, to);
     case 'get_goals': return getGoals(db, uid);
     default: throw new Error(`Unknown tool ${name}`);
   }
 }
 
 // ───────────────────────────── the agent ─────────────────────────────
-const SYSTEM = `You are a personal health and nutrition analyst inside a coaching app. The user logs body metrics (manually and from Apple Health), meals (often with AI-estimated macros from photos) and daily check-ins.
+const SYSTEM = `You are a personal health and nutrition analyst inside a coaching app. The user logs body metrics (manually and from Apple Health), meals (often with AI-estimated macros from photos), supplements and daily check-ins.
 
 How to work:
 - Look at the data before answering: call the tools you need (you may call several at once). Use get_trends for trend questions.
 - Ground every claim in the user's numbers, and say how much data it rests on (e.g. "based on 9 of the last 14 days"). If data is missing or too sparse, say so and tell them exactly what to log.
 - Look for relationships across sources — e.g. sleep vs. energy, protein vs. training days, weekend vs. weekday intake, weight trend vs. calorie average.
+- When supplements are relevant, check their timing rules (iron alone and away from zinc/magnesium/calcium/coffee; fat-soluble ones with a fatty meal; collagen + vitamin C 30-60 min before activity) and note that supplement advice is not medical advice.
 - AI-estimated meal macros can be off by 20-30%; treat them as approximations.
 - Give 2-4 concrete, prioritised actions. Be direct and encouraging, like a good coach — no filler.
 - You are not a doctor. If something looks medically concerning (e.g. very low intake, resting heart rate rising sharply for days, rapid unexplained weight change, chest pain or similar mentioned in notes), say plainly that they should check with a doctor.
