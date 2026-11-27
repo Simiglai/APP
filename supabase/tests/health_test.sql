@@ -34,3 +34,11 @@ do $$ begin
 end $$;
 reset role;
 select 'health tests passed' as result;
+-- saved meals are private too
+set role authenticated;
+select set_config('request.jwt.claim.sub', '11111111-1111-1111-1111-111111111111', false);
+insert into health_saved_meals (user_id, name, kcal) values (auth.uid(), 'Smoothie', 850);
+select set_config('request.jwt.claim.sub', '22222222-2222-2222-2222-222222222222', false);
+do $$ begin assert (select count(*) from health_saved_meals) = 0, 'saved meals leaked'; end $$;
+reset role;
+select 'saved meals tests passed' as result;

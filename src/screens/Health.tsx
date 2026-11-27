@@ -23,6 +23,7 @@ type Metrics = {
 type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 type Meal = { id: string; eaten_at: string; meal: MealType; description: string; photo_path: string | null; kcal: number | null; protein_g: number | null; carbs_g: number | null; fat_g: number | null; fiber_g: number | null; ai: Estimate | null };
 type Estimate = { items: { name: string; grams: number; kcal: number }[]; description: string; kcal: number; protein_g: number; carbs_g: number; fat_g: number; fiber_g: number; confidence: 'low' | 'medium' | 'high'; notes: string };
+type SavedMeal = { id: string; name: string; meal: MealType; description: string; kcal: number | null; protein_g: number | null; carbs_g: number | null; fat_g: number | null; fiber_g: number | null; items: unknown };
 type Settings = { kcal_target: number | null; protein_target_g: number | null; carbs_target_g: number | null; fat_target_g: number | null; goal_weight_kg: number | null; context: string };
 type Report = { id?: string; kind: 'chat' | 'weekly'; question: string; answer: string; created_at: string };
 
@@ -194,6 +195,49 @@ function MealLogger({ userId, date, onSaved }: { userId: string; date: string; o
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
+  const [saved, setSaved] = useState<SavedMeal[]>([]);
+
+  const loadSaved = useCallback(async () => {
+    const { data } = await supabase.from('health_saved_meals').select('*').eq('user_id', userId).order('name');
+    setSaved((data as SavedMeal[]) ?? []);
+  }, [userId]);
+  useEffect(() => {
+    loadSaved();
+  }, [loadSaved]);
+
+  /** meals logged for an earlier day get noon of that day; today's get the current time */
+  const eatenAt = () => {
+    const [y, mo, d] = date.split('-').map(Number);
+    return date === todayKey() ? new Date().toISOString() : new Date(y, mo - 1, d, 12).toISOString();
+  };
+
+  const logSaved = async (f: SavedMeal) => {
+    setBusy(t('Saving…')); setError('');
+    const { error: insErr } = await supabase.from('health_meals').insert({
+      user_id: userId, eaten_at: eatenAt(), meal: f.meal, description: f.description || f.name,
+      kcal: f.kcal, protein_g: f.protein_g, carbs_g: f.carbs_g, fat_g: f.fat_g, fiber_g: f.fiber_g, ai: null,
+    });
+    setBusy('');
+    if (insErr) setError(errText(insErr));
+    else onSaved();
+  };
+
+  const removeSaved = async (f: SavedMeal) => {
+    if (!confirm(t('Remove “{name}” from saved meals?', { name: f.name }))) return;
+    await supabase.from('health_saved_meals').delete().eq('id', f.id);
+    loadSaved();
+  };
+
+  const saveAsFavourite = async () => {
+    const name = prompt(t('Name this meal (e.g. Morning smoothie)'), text.trim().slice(0, 40));
+    if (!name?.trim()) return;
+    const { error: insErr } = await supabase.from('health_saved_meals').insert({
+      user_id: userId, name: name.trim().slice(0, 100), meal, description: text.trim(), items: est?.items ?? null,
+      kcal: num(vals.kcal), protein_g: num(vals.protein_g), carbs_g: num(vals.carbs_g), fat_g: num(vals.fat_g), fiber_g: num(vals.fiber_g),
+    });
+    if (insErr) setError(errText(insErr));
+    else loadSaved();
+  };
 
   const reset = () => {
     if (photo) URL.revokeObjectURL(photo.url);
@@ -242,9 +286,7 @@ function MealLogger({ userId, date, onSaved }: { userId: string; date: string; o
     setBusy(t('Saving…')); setError('');
     try {
       const photo_path = (await upload()) ?? null;
-      // meals logged for an earlier day get noon of that day; today's get the current time
-      const [y, mo, d] = date.split('-').map(Number);
-      const eaten_at = date === todayKey() ? new Date().toISOString() : new Date(y, mo - 1, d, 12).toISOString();
+      const eaten_at = eatenAt();
       const { error: insErr } = await supabase.from('health_meals').insert({
         user_id: userId, eaten_at, meal, description: text.trim(), photo_path, ai: est,
         kcal: num(vals.kcal), protein_g: num(vals.protein_g), carbs_g: num(vals.carbs_g), fat_g: num(vals.fat_g), fiber_g: num(vals.fiber_g),
@@ -260,6 +302,25 @@ function MealLogger({ userId, date, onSaved }: { userId: string; date: string; o
   };
 
   return (
+    <>
+    {saved.length > 0 && (
+      <Card title={t('Saved meals')} hint={t('One tap logs it for {day}.', { day: date === todayKey() ? t('today') : prettyDate(date) })}>
+        <div className="list">
+          {saved.map((f) => (
+            <div key={f.id} className="list__item health-meal">
+              <span>
+                <strong>{f.name}</strong>
+                <small className="muted">{fmt(f.kcal)} kcal · P {fmt(f.protein_g)} · C {fmt(f.carbs_g)} · F {fmt(f.fat_g)}</small>
+              </span>
+              <span className="row">
+                <button className="btn" disabled={!!busy} onClick={() => logSaved(f)}>{t('Log')}</button>
+                <button className="btn btn--link muted small" onClick={() => removeSaved(f)} aria-label={t('Delete')}>✕</button>
+              </span>
+            </div>
+          ))}
+        </div>
+      </Card>
+    )}
     <Card title={t('Log a meal')} hint={t('Snap a photo or describe it — the agent estimates the macros. Check and adjust before saving.')}>
       <div className="chips">
         {MEALS.map((x) => <button key={x} className={`chip${meal === x ? ' is-on' : ''}`} onClick={() => setMeal(x)}>{t(MEAL_LABEL[x])}</button>)}
@@ -289,10 +350,12 @@ function MealLogger({ userId, date, onSaved }: { userId: string; date: string; o
       {error && <p className="error">{error}</p>}
       <div className="row">
         <button className="btn" disabled={!!busy || (!text.trim() && !photo && !vals.kcal)} onClick={save}>{t('Save meal')}</button>
+        {vals.kcal && <button className="btn btn--link" onClick={saveAsFavourite}>☆ {t('Save as favourite')}</button>}
         {(photo || text || est) && <button className="btn btn--link" onClick={reset}>{t('Clear')}</button>}
         {busy && <span className="muted small">{busy}</span>}
       </div>
     </Card>
+    </>
   );
 }
 
